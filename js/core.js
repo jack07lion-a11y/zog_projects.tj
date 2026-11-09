@@ -14,6 +14,8 @@
   S.defaultLang = S.defaultLang || "tg"; S.fallbackLang = S.fallbackLang || "en";
   S.instagram = S.instagram || {}; S.whatsapp = S.whatsapp || "992907539527"; S.name = S.name || "ZOG Projects";
   var loaded = {};
+  Z.hooks = [];
+  Z.onRender = function (fn) { Z.hooks.push(fn); };
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var NAV = [
     ["home", "index.html", "nav.home"],
@@ -251,7 +253,7 @@
   var io = null;
   function setupReveal(instant) {
     if (instant || reduce || !("IntersectionObserver" in window)) return;
-    var sel = ".hero-in > *, .page-head .wrap > *, .sec-head, .ask, .tile, .opt, .card, .work, .cta-box, .stack .btn, .hint, .phone";
+    var sel = ".hero-text > *, .page-head .wrap > *, .sec-head, .ask, .tile, .opt, .card, .work, .cta-box, .stack .btn, .hint, .phone";
     var els = Array.prototype.slice.call(document.querySelectorAll("#app " + sel));
     if (io) io.disconnect();
     io = new IntersectionObserver(function (entries) {
@@ -312,9 +314,11 @@
     renderFooter(); renderDock(); updateMeta();
   }
   function render(fromLang) {
+    Z.fromLang = !!fromLang;
     renderAll();
     playApp(fromLang ? "swap" : "enter", 900);
     setupReveal(!!fromLang);
+    Z.hooks.forEach(function (fn) { try { fn(); } catch (e) {} });
   }
 
   /* Категориялар орасида силлиқ ўтиш: эскиси пуфак ўрнига "йиғилади", янгиси ўша жойдан "очилади" */
