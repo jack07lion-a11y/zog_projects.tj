@@ -410,8 +410,11 @@ body::after {
 /* ================= Бош саҳифа: тоза саҳна, 3 та қўл ================= */
 .sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 body[data-page="home"] .site-footer { display: none; }
-body[data-page="home"] main { height: calc(100vh - 64px); height: calc(100svh - 64px); overflow: hidden; flex: none; }
-.stage { position: relative; width: 100%; height: 100%; --mx: 0; --my: 0; }
+/* Бош саҳифа скролл бўлмайди: айфонда 100vh ёпиқ панелларни ҳам ҳисоблагани учун body ни экранга қотирамиз */
+html.nos, html.nos body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+html.nos body { position: fixed; inset: 0; width: 100%; min-height: 0; }
+html.nos main { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.stage { position: absolute; inset: 0; --mx: 0; --my: 0; }
 /* Саҳна: телефонда (тик экран) тўлиқ экран; компьютерда (кенг экран) марказдаги телефон шаклидаги "карточка" */
 .canvas { position: absolute; inset: 0; overflow: hidden; }
 @media (min-aspect-ratio: 1/1) {
@@ -460,5 +463,5 @@ body[data-page="home"] main { height: calc(100vh - 64px); height: calc(100svh - 
 .hf { animation: hfloat var(--fl) ease-in-out infinite; animation-delay: calc(var(--i) * -2.3s); }
 @keyframes hfloat { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(calc(var(--fa) * -1)) rotate(.7deg); } }
 .art { transform: translate3d(calc(var(--mx) * 18px * var(--k)), calc(var(--my) * 14px * var(--k)), 0); }
-.art img { display: block; width: 100%; height: auto; filter: drop-shadow(0 12px 14px rgba(18, 21, 32, .2)); }
+.art img { display: block; width: 100%; height: auto; }
 @media (prefers-reduced-motion: reduce) { .hf, .he, .hi { animation: none !important; } }

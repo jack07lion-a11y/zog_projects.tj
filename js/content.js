@@ -95,7 +95,7 @@ window.SITE = {
      z — қайси қўл устида туради (катта сон — юқорида)
      fx, fy — учиб киришни бошлайдиган жой (саҳна ўлчамининг %, масалан -110 = чапдан ташқарида) */
 window.HANDS = {
-  h1: { src: "assets/hands/hand1.webp", x: 37.5, y: 46.9, w: 80, r: 0, f: 0, z: 2, fx: -110, fy: 0 },
-  h2: { src: "assets/hands/hand2.webp", x: 64.9, y: 10.8, w: 80, r: 0, f: 0, z: 1, fx: 70, fy: -90 },
-  h3: { src: "assets/hands/hand3.webp", x: 68, y: 84, w: 80, r: 0, f: 0, z: 3, fx: 70, fy: 90 }
+  h1: { src: "assets/hands/hand1-v2.webp", x: 33.9, y: 47.9, w: 103.1, r: 0, f: 0, z: 2, fx: -110, fy: 0 },
+  h2: { src: "assets/hands/hand2-v2.webp", x: 68.3, y: 9.5, w: 101.9, r: 0, f: 0, z: 1, fx: 70, fy: -90 },
+  h3: { src: "assets/hands/hand3-v2.webp", x: 71.5, y: 86.2, w: 102, r: 0, f: 0, z: 3, fx: 70, fy: 90 }
 };
