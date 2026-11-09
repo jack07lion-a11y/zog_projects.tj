@@ -464,13 +464,17 @@ html.nos main { position: relative; flex: 1; min-height: 0; overflow: hidden; }
 @keyframes hfloat { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(calc(var(--fa) * -1)) rotate(.7deg); } }
 .art { transform: translate3d(calc(var(--mx) * 18px * var(--k)), calc(var(--my) * 14px * var(--k)), 0); }
 .art img { display: block; width: 100%; height: auto; }
-/* Қўл ушлаб турган панел: қўл орқасида, ўз чуқурлигида қимирлайди */
+/* Қўл ушлаб турган панел: қўл билан бирга қаттиқ ҳаракатланади (ушланган), бармоқлар тегадиган жойларда юмшоқ соя */
 .pnl { position: absolute; translate: -50% -50%; rotate: var(--pr, 0deg); pointer-events: auto; -webkit-tap-highlight-color: transparent;
-  transform: translate3d(calc(var(--mx) * 11px * var(--k)), calc(var(--my) * 8px * var(--k)), 0); }
-.pnl img { display: block; width: 100%; height: auto; transition: scale .35s var(--spring); animation: pnlIn 1.2s cubic-bezier(.2, 1.25, .3, 1) 1.55s backwards, pnlWob 5.8s ease-in-out 2.75s infinite alternate; }
+  transform: translate3d(calc(var(--mx) * 18px * var(--k)), calc(var(--my) * 14px * var(--k)), 0); }
+.pnl img { display: block; width: 100%; height: auto; transition: scale .35s var(--spring); animation: pnlIn 1.2s cubic-bezier(.2, 1.25, .3, 1) 1.55s backwards; }
+.pnl::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; animation: aoIn .6s ease-out 2.4s forwards;
+  -webkit-mask: var(--pimg) center / 100% 100% no-repeat; mask: var(--pimg) center / 100% 100% no-repeat;
+  background: linear-gradient(180deg, rgba(18, 21, 32, .34) 0%, rgba(18, 21, 32, 0) 24%, rgba(18, 21, 32, 0) 70%, rgba(18, 21, 32, .32) 100%), linear-gradient(90deg, rgba(18, 21, 32, .22) 0%, rgba(18, 21, 32, 0) 34%); }
+.stage.still .pnl::after { animation: none; opacity: 1; }
+@keyframes aoIn { to { opacity: 1; } }
 .pnl:active img { scale: .93; }
 @media (hover: hover) { .pnl:hover img { scale: 1.05; } }
-.stage.still .pnl img { animation: pnlWob 5.8s ease-in-out infinite alternate; }
+.stage.still .pnl img { animation: none; }
 @keyframes pnlIn { from { transform: scale(.45) rotate(-14deg); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes pnlWob { from { transform: translateY(-3px) rotate(-1.8deg); } to { transform: translateY(3px) rotate(1.8deg); } }
 @media (prefers-reduced-motion: reduce) { .hf, .he, .hi, .pnl img { animation: none !important; } }

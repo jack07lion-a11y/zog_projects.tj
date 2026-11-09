@@ -97,7 +97,7 @@ window.SITE = {
 window.HANDS = {
   h1: { src: "assets/hands/hand1-v2.webp", x: 33.9, y: 47.9, w: 103.1, r: 0, f: 0, z: 2, fx: -110, fy: 0,
         /* қўл ушлаб турган панел: gx, gy — қўл расмидаги "C" очиқ жойининг маркази (%), pw — панел эни (қўл расми энининг %), rot — бурилиш */
-        panel: { src: "assets/panels/anim-v1.webp", href: "animation.html", k: "nav.anim", gx: 80.6, gy: 50.2, pw: 31, rot: 0 } },
+        panel: { src: "assets/panels/anim-v1.webp", href: "animation.html", k: "nav.anim", gx: 86.8, gy: 47, pw: 32, rot: -2 } },
   h2: { src: "assets/hands/hand2-v2.webp", x: 68.3, y: 9.5, w: 101.9, r: 0, f: 0, z: 1, fx: 70, fy: -90 },
   h3: { src: "assets/hands/hand3-v2.webp", x: 71.5, y: 86.2, w: 102, r: 0, f: 0, z: 3, fx: 70, fy: 90 }
 };
