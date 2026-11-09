@@ -50,7 +50,7 @@ Z.noDock = true;
   });
 
   /* ---------- Физика ---------- */
-  var cv, asm, mh, svg, items = [], loop = 0, last = 0, W = 0, H = 0, sx = 0, sy = 0, pcx = null, pcy = 0, pvx = 0, pvy = 0, sax = 0, say = 0;
+  var pull = null, cv, asm, mh, svg, items = [], loop = 0, last = 0, W = 0, H = 0, sx = 0, sy = 0, pcx = null, pcy = 0, pvx = 0, pvy = 0, sax = 0, say = 0;
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function el(name, cls) { var n = document.createElementNS(NS, name); if (cls) n.setAttribute("class", cls); return n; }
   function f1(v) { return v.toFixed(1); }
@@ -134,25 +134,35 @@ Z.noDock = true;
   document.addEventListener("visibilitychange", function () { if (document.getElementById("asm")) { if (document.hidden) stop(); else start(); } });
   var rz = 0;
   window.addEventListener("resize", function () { if (!cv || !document.getElementById("asm")) return; clearTimeout(rz); rz = setTimeout(function () { layout(); draw(performance.now(), 0, 0); }, 120); });
+  document.addEventListener("keydown", function (e) {
+    if (pull && document.getElementById("asm") && (e.key === "ArrowUp" || e.key === "Backspace" || e.key === "Escape")) { e.preventDefault(); pull.key(); }
+  });
   Z.promoState = function () { return items.map(function (o) { return { th: o.th_, L: o.L }; }); };   /* синов учун */
 
   /* ---------- Чиқиш: қўл ва иплар тепага тортилади ---------- */
   Z.exits.promo = function (done) {
     var a = document.getElementById("asm");
     if (!a || reduce) { done(); return; }
-    var an = a.animate([{ transform: "translate3d(0,0,0)" }, { transform: "translate3d(0,-115%,0)" }], { duration: 760, easing: "cubic-bezier(.55,0,.85,.3)", fill: "forwards" });
-    var fin = false; function f() { if (!fin) { fin = true; done(); } }
+    var from = Z.pullOffset || 0, pulled = from < -30;                      /* тортилган бўлса, шу жойдан давом этамиз */
+    a.style.transition = "none";
+    var an = a.animate([{ transform: "translate3d(0," + from + "px,0)" }, { transform: "translate3d(0,-115%,0)" }],
+      pulled ? { duration: 520, easing: "cubic-bezier(.3,.45,.7,1)", fill: "forwards" } : { duration: 760, easing: "cubic-bezier(.55,0,.85,.3)", fill: "forwards" });
+    var fin = false; function f() { if (!fin) { fin = true; Z.pullOffset = 0; done(); } }
     an.onfinish = f; setTimeout(f, 1200);
   };
 
   Z.onRender(function () {
-    stop(); items = []; cv = asm = mh = svg = null;
+    stop(); items = []; cv = asm = mh = svg = null; pull = null;
     var stage = document.getElementById("stage");
     if (!stage || stage.getAttribute("data-scene") !== "promo") return;
     sx = sy = 0; sax = say = 0;
     build(stage);
     var img = stage.querySelector(".mhf img");
     Z.waitImages([img], function () { requestAnimationFrame(function () { stage.classList.add("ready"); }); });
+    /* қўлни тепага тортиб бош саҳнага қайтиш (кириш анимацияси тугагач ёқилади) */
+    pull = Z.pull(cv, asm, { enabled: false });
+    var armed = false; function arm() { if (!armed) { armed = true; pull.enable(); } }
+    if (reduce || Z.fromLang) arm(); else { asm.addEventListener("animationend", arm); setTimeout(arm, 3200); }
     start();
   });
 })();

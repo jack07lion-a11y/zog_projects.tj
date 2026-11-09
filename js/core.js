@@ -419,6 +419,8 @@
     dev: { href: "dev.html", scripts: ["js/pages/dev.js"] }
   };
   Z.SCENES = SCENES; Z.exits = {};
+  Z.depth = (history.state && history.state.d) || 0;        /* нечта саҳна ўтиши (pushState) қилинган: орқага қайтиш учун */
+  Z.pullOffset = 0;
   var loadedScripts = {}, navBusy = false;
   function loadScript(src) {
     if (loadedScripts[src]) return loadedScripts[src];
@@ -456,7 +458,7 @@
     function go() {
       Promise.all(SCENES[to].scripts.map(loadScript)).then(function () {
         Z.page = to;
-        if (!opts.pop) { try { history.pushState({ scene: to }, "", SCENES[to].href); } catch (e) {} }
+        if (!opts.pop) { try { history.pushState({ scene: to, d: Z.depth + 1 }, "", SCENES[to].href); Z.depth += 1; } catch (e) {} }
         window.scrollTo(0, 0);
         renderScene(); navBusy = false;
       }, function () { navBusy = false; location.href = SCENES[to].href; });
@@ -465,7 +467,55 @@
     if (ex && !reduce) ex(go, { to: to, from: from }); else go();
     return true;
   };
-  window.addEventListener("popstate", function () {
+  /* Орқага (бош саҳнага) қайтиш: тарих бўлса, браузернинг "орқага"си, бўлмаса — тўғридан-тўғри */
+  Z.back = function () { if (Z.depth > 0) { try { history.back(); return; } catch (e) {} } Z.nav("home"); };
+
+  /* Тепага тортиш ишораси: root да бармоқ/сичқонча билан тепага суриш, ғилдирак ёки тугма (ArrowUp) — mover тепага кетади.
+     Етарлича тортилса — onComplete (одатда Z.back); бўлмаса пружинадек жойига қайтади. Ҳеч қандай кўринадиган тугма йўқ. */
+  Z.pull = function (root, mover, opts) {
+    opts = opts || {};
+    var st = null, moved = false, lastMove = 0, off = 0, lastY = 0, lastT = 0, vel = 0, wacc = 0, wt = 0, enabled = !!opts.enabled;
+    function H() { return root.clientHeight || window.innerHeight; }
+    function apply(o) { off = o; Z.pullOffset = o; mover.style.transition = "none"; mover.style.transform = "translate3d(0," + o.toFixed(1) + "px,0)"; }
+    function spring() {
+      off = 0; Z.pullOffset = 0; mover.style.transition = "transform .75s cubic-bezier(.34,1.5,.64,1)"; mover.style.transform = "translate3d(0,0,0)";
+      setTimeout(function () { mover.style.transition = ""; }, 800);
+    }
+    function complete() { enabled = false; (opts.onComplete || Z.back)(); }
+    root.addEventListener("pointerdown", function (e) {
+      if (!enabled || e.button) return;
+      st = { y: e.clientY }; moved = false; vel = 0; lastY = e.clientY; lastT = performance.now();
+    });
+    root.addEventListener("pointermove", function (e) {
+      if (!st) return;
+      var dy = e.clientY - st.y;
+      if (!moved) { if (Math.abs(dy) < 10) return; if (dy > 0) { st = null; return; } moved = true; try { root.setPointerCapture(e.pointerId); } catch (x) {} }
+      var now = performance.now(); if (now > lastT) vel = (e.clientY - lastY) / (now - lastT); lastY = e.clientY; lastT = now;
+      apply(dy < 0 ? dy : dy * 0.18);                  /* тепага — эркин, пастга — қаршилик */
+    });
+    function up() {
+      if (!st) return; st = null;
+      if (!moved) return;
+      lastMove = performance.now();
+      if (off < -H() * 0.2 || (vel < -0.7 && off < -40)) complete(); else spring();
+    }
+    root.addEventListener("pointerup", up); root.addEventListener("pointercancel", up);
+    root.addEventListener("click", function (e) { if (moved || performance.now() - lastMove < 350) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+    root.addEventListener("wheel", function (e) {
+      if (!enabled) return;
+      if (e.deltaY <= 0 && off >= 0) return;
+      e.preventDefault();
+      wacc = Math.max(-H() * 0.7, Math.min(0, wacc - e.deltaY)); apply(wacc);
+      clearTimeout(wt); wt = setTimeout(function () { if (off < -H() * 0.16) complete(); else { wacc = 0; spring(); } }, 170);
+    }, { passive: false });
+    return {
+      enable: function () { enabled = true; },
+      key: function () { if (!enabled) return; apply(-H() * 0.25); complete(); }          /* ArrowUp / Backspace / Escape */
+    };
+  };
+
+  window.addEventListener("popstate", function (ev) {
+    Z.depth = (ev.state && typeof ev.state.d === "number") ? ev.state.d : 0;
     var to = sceneByHref(location.pathname);
     if (to && SCENES[Z.page]) { if (to !== Z.page) Z.nav(to, { pop: true }); }
     else location.reload();
