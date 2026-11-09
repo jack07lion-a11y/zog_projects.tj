@@ -13,6 +13,7 @@
   ];
   S.defaultLang = S.defaultLang || "tg"; S.fallbackLang = S.fallbackLang || "en";
   S.instagram = S.instagram || {}; S.whatsapp = S.whatsapp || "992907539527"; S.name = S.name || "ZOG Projects";
+  Z.ver = VER;
   var loaded = {};
   Z.hooks = [];
   Z.onRender = function (fn) { Z.hooks.push(fn); };
@@ -291,7 +292,7 @@
   var ORDERC = ["anim", "promo", "dev"];
   var slots = null, switching = false;
   function initDock(p) {
-    if (!CATS[p]) { slots = null; document.body.classList.remove("has-dock"); return; }
+    if (!CATS[p] || Z.noDock) { slots = null; document.body.classList.remove("has-dock"); return; }
     slots = ORDERC.filter(function (c) { return c !== p; });
     document.body.classList.add("has-dock");
   }

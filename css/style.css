@@ -409,7 +409,7 @@ body::after {
 
 /* ================= Бош саҳифа: тоза саҳна, 3 та қўл ================= */
 .sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-body[data-page="home"] .site-footer { display: none; }
+html.nos .site-footer { display: none; }
 /* Бош саҳифа скролл бўлмайди: айфонда 100vh ёпиқ панелларни ҳам ҳисоблагани учун body ни экранга қотирамиз */
 html.nos, html.nos body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 html.nos body { position: fixed; inset: 0; width: 100%; min-height: 0; }

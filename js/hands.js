@@ -17,7 +17,7 @@
   }
   function gate(stage) {
     var imgs = Array.prototype.slice.call(stage.querySelectorAll(".art img")), left = imgs.length;
-    function reveal() { requestAnimationFrame(function () { stage.classList.add("ready"); }); }
+    function reveal() { requestAnimationFrame(function () { stage.classList.add("ready"); setTimeout(prefetch, 2500); }); }
     if (!left) { reveal(); return; }
     function one() { if (--left === 0) reveal(); }
     imgs.forEach(function (img) {
@@ -170,6 +170,16 @@
     setTimeout(function () { if (!gotMotion && !motionGranted) b.classList.remove("hide"); }, 1400);
   }
 
+  /* ---------- 5) Бошқа саҳифаларни олдиндан юклаш: қўллар чиққач, тинч вақтда, интернет секин бўлмаса ---------- */
+  var prefetched = false;
+  function prefetch() {
+    if (prefetched) return; prefetched = true;
+    var c = navigator.connection;
+    if (c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ""))) return;          /* секин интернетда ҳеч нарса қўшимча юкламаймиз */
+    var v = Z.ver || "", list = ["animation.html", "promotion.html", "dev.html", "js/pages/anim.js" + v, "js/pages/promo.js" + v, "js/pages/dev.js" + v];
+    var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1500); };
+    idle(function () { list.forEach(function (u) { try { fetch(u, { credentials: "same-origin" }).catch(function () {}); } catch (e) {} }); });
+  }
   Z.onRender(function () {
     stop();
     var stage = document.getElementById("stage");

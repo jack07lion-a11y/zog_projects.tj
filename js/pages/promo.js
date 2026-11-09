@@ -1,6 +1,6 @@
-/* Промоушн саҳифаси */
+/* Promotion саҳифаси: ҳозирча тоза тўқ сариқ саҳна (мазмун кейин қўшилади) */
+Z.noDock = true;
 Z.register("promo", function () {
-  return Z.catHead(Z.BIG.promo, "nav.promo", "promo.lead") +
-    Z.grid([Z.watchOpt(Z.S.instagram.promotions, "opt.watch.promo"), Z.orderOpt("saas"), Z.orderOpt("ad"), Z.courseOpt("promo")]) +
-    Z.worksSection(["saas", "ad"]);
+  return '<h1 class="sr">' + Z.esc(Z.t("nav.promo")) + '</h1><p class="sr">' + Z.esc(Z.t("promo.lead")) + "</p>" +
+    '<div class="stage page-stage" id="stage"></div>';
 });

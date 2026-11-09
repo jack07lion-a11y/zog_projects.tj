@@ -1,6 +1,6 @@
-/* Анимация саҳифаси */
+/* Animation саҳифаси: ҳозирча тоза тўқ сариқ саҳна (мазмун кейин қўшилади) */
+Z.noDock = true;
 Z.register("anim", function () {
-  return Z.catHead(Z.BIG.anim, "nav.anim", "anim.lead") +
-    Z.grid([Z.watchOpt(Z.S.instagram.animations, "opt.watch.anim"), Z.orderOpt("anim"), Z.courseOpt("anim")]) +
-    Z.worksSection(["cartoon"]);
+  return '<h1 class="sr">' + Z.esc(Z.t("nav.anim")) + '</h1><p class="sr">' + Z.esc(Z.t("anim.lead")) + "</p>" +
+    '<div class="stage page-stage" id="stage"></div>';
 });
