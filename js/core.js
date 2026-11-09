@@ -448,7 +448,12 @@
   }
   function warmScene(to) {                                   /* келаётган саҳна расмини олдиндан декодлаймиз (чиқиш анимацияси давомида) */
     var a = (window.SCENE_ASSETS || {})[to]; if (!a) return;
-    try { var im = new Image(); im.sizes = a.sizes; im.srcset = a.srcset; im.src = a.src; if (im.decode) im.decode().catch(function () {}); } catch (e) {}
+    try {
+      (a.list || [a.src]).forEach(function (u) {
+        var im = new Image(); if (a.srcset) { im.sizes = a.sizes; im.srcset = a.srcset; } im.src = u;
+        if (im.decode) im.decode().catch(function () {});
+      });
+    } catch (e) {}
   }
   Z.nav = function (to, opts) {
     opts = opts || {};

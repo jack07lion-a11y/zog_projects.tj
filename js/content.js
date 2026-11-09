@@ -115,6 +115,11 @@ window.HANDS = {
    Promotion саҳнасидаги қўғирчоқбоз қўли. anchors — иплар боғланадиган бармоқ учлари (расм ўлчамининг %):
    pinky — кичик бармоқ, middle — ўрта, index — кўрсаткич, thumb — бош бармоқ. */
 window.SCENE_ASSETS = {
+  /* Animation: футболчи кадрлари (3 та варақ, ҳар бири 4×2 = 8 кадр) ва тўп. launch — тепиш кадридаги тўпнинг жойи (кадр ўлчамига нисбатан) */
+  anim: {
+    list: ["assets/anim/run-v1.webp", "assets/anim/dribble-v1.webp", "assets/anim/kick-v1.webp", "assets/anim/ball-v1.webp"],
+    launch: { x: 0.8002, y: 0.1101, r: 0.0631 }
+  },
   promo: {
     ar: 1.1873, sizes: "(min-aspect-ratio: 1/1) 52vh, 104vw",
     src: "assets/promo/hand-v1.webp",

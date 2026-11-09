@@ -514,3 +514,24 @@ html.nos body::after { animation: none; will-change: auto; }   /* бош саҳ�
 .pitem:active .slab { scale: .93; }
 @media (hover: hover) { .pitem:hover .slab { scale: 1.06; } }
 @media (prefers-reduced-motion: reduce) { .asm { visibility: visible; animation: none !important; } .mhf { animation: none !important; } }
+
+/* ================= Animation саҳнаси: футболчи ва тўплар ================= */
+.ascene .canvas { touch-action: none; }
+.acont { position: absolute; inset: 0; visibility: hidden; will-change: transform; }
+.stage.ready .acont, .stage.still .acont { visibility: visible; }
+.acont .pre { display: none; }
+.fb { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform, opacity; z-index: 3; }
+.fs { position: absolute; inset: 0; background-repeat: no-repeat; background-size: 400% 200%; visibility: hidden; }
+.atrail { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
+.atrail line { stroke: #fff0d6; stroke-width: 1.5; stroke-linecap: round; }
+.gh { position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0; will-change: transform; z-index: 2; transform-origin: 50% 50%; }
+.abwrap { position: absolute; left: 0; top: 0; visibility: hidden; will-change: transform; z-index: 4; transform-origin: 50% 50%; }
+.abal { display: block; position: relative; width: 100%; height: 100%; pointer-events: none; -webkit-tap-highlight-color: transparent; }
+.abwrap.live .abal { pointer-events: auto; }
+.abimg { display: block; width: 100%; height: 100%; transition: scale .3s var(--spring); }
+.abal:active .abimg { scale: .94; }
+@media (hover: hover) { .abwrap.live .abal:hover .abimg { scale: 1.04; } }
+.ab-logo { position: absolute; left: 50%; top: 29%; width: calc(var(--R) * .4); aspect-ratio: 1; translate: -50% 0; display: grid; place-items: center; color: #ffb066; pointer-events: none; }
+.ab-logo svg { width: 100%; height: 100%; }
+.ab-txt { position: absolute; left: 0; right: 0; top: 52%; text-align: center; white-space: nowrap; font-weight: 800; font-size: calc(var(--R) * var(--tf)); line-height: 1.05; color: var(--cream); text-shadow: 0 1px 3px rgba(0, 0, 0, .55); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .acont { visibility: visible; } }

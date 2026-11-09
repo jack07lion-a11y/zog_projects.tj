@@ -42,8 +42,11 @@
       list.forEach(function (u) { try { fetch(u, { credentials: "same-origin" }).catch(function () {}); } catch (e) {} });
       var SA = window.SCENE_ASSETS || {};
       Object.keys(SA).forEach(function (k) {            /* саҳна расмлари: браузер ўзи тўғри ўлчамни танлайди */
-        var im = new Image(); try { im.fetchPriority = "low"; } catch (e) {}
-        im.sizes = SA[k].sizes; im.srcset = SA[k].srcset; im.src = SA[k].src;
+        (SA[k].list || [SA[k].src]).forEach(function (u) {
+          var im = new Image(); try { im.fetchPriority = "low"; } catch (e) {}
+          if (SA[k].srcset) { im.sizes = SA[k].sizes; im.srcset = SA[k].srcset; }
+          im.src = u;
+        });
       });
     });
   }
