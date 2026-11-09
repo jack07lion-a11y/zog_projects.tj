@@ -85,19 +85,24 @@ window.SITE = {
   ];
 })();
 
-/* ---------- 4. ҚЎЛЛАР (бош саҳифадаги 3 та 3D қўл) ----------
+/* ---------- 4. ҚЎЛЛАР (бош саҳифадаги 3 та 3D қўл ва уларнинг иконкалари) ----------
    Жойлашув "саҳна" (экран) бўйича фоизларда. Уларни муҳаррир (артефакт) орқали созлаб,
    чиққан кодни шу ерга қўясиз.
-     src — расм йўли
-     x, y — қўл марказининг жойи (саҳна эни/бўйининг %)
-     w — қўл эни (саҳна энининг %)
-     r — бурилиш (градус), f — 1 бўлса, ойнадек акс эттирилади
-     z — қайси қўл устида туради (катта сон — юқорида)
-     fx, fy — учиб киришни бошлайдиган жой (саҳна ўлчамининг %, масалан -110 = чапдан ташқарида) */
+     src, srcset — қўл расми (3 хил ўлчам: интернет секин бўлса, браузер ўзи кичигини танлайди)
+     x, y — қўл марказининг жойи (саҳна эни/бўйининг %), w — қўл эни (саҳна энининг %)
+     r — бурилиш (градус), f — 1 бўлса, ойнадек акс эттирилади, z — қайси қўл устида туради
+     fx, fy — учиб киришни бошлайдиган жой (саҳна ўлчамининг %)
+     panel — қўл ушлаб турган иконка: icon (anim | promo | dev), href (босилса қаерга боради),
+             k (номи), gx, gy — иконка маркази (қўл расми ўлчамининг %), pw — иконка эни (%), rot — бурилиш */
+window.HANDS_SIZES = "(min-aspect-ratio: 1/1) 52vh, 104vw";
 window.HANDS = {
-  h1: { src: "assets/hands/hand1-v2.webp", x: 33.9, y: 47.9, w: 103.1, r: 0, f: 0, z: 2, fx: -110, fy: 0,
-        /* қўл ушлаб турган панел: gx, gy — қўл расмидаги "C" очиқ жойининг маркази (%), pw — панел эни (қўл расми энининг %), rot — бурилиш */
-        panel: { src: "assets/panels/anim-v1.webp", href: "animation.html", k: "nav.anim", gx: 86.8, gy: 47, pw: 32, rot: -2 } },
-  h2: { src: "assets/hands/hand2-v2.webp", x: 68.3, y: 9.5, w: 101.9, r: 0, f: 0, z: 1, fx: 70, fy: -90 },
-  h3: { src: "assets/hands/hand3-v2.webp", x: 71.5, y: 86.2, w: 102, r: 0, f: 0, z: 3, fx: 70, fy: 90 }
+  h1: { src: "assets/hands/hand1-v2.webp", srcset: "assets/hands/hand1-v2-600.webp 600w, assets/hands/hand1-v2-900.webp 900w, assets/hands/hand1-v2.webp 1200w",
+        x: 33.9, y: 47.9, w: 103.1, r: 0, f: 0, z: 2, fx: -110, fy: 0,
+        panel: { icon: "anim", href: "animation.html", k: "nav.anim", gx: 87, gy: 47.5, pw: 27, rot: -3 } },
+  h2: { src: "assets/hands/hand2-v2.webp", srcset: "assets/hands/hand2-v2-600.webp 600w, assets/hands/hand2-v2-900.webp 900w, assets/hands/hand2-v2.webp 1200w",
+        x: 68.3, y: 9.5, w: 101.9, r: 0, f: 0, z: 1, fx: 70, fy: -90,
+        panel: { icon: "promo", href: "promotion.html", k: "nav.promo", gx: 33, gy: 65.5, pw: 27, rot: 4 } },
+  h3: { src: "assets/hands/hand3-v2.webp", srcset: "assets/hands/hand3-v2-600.webp 600w, assets/hands/hand3-v2-900.webp 900w, assets/hands/hand3-v2.webp 1200w",
+        x: 71.5, y: 86.2, w: 102, r: 0, f: 0, z: 3, fx: 70, fy: 90,
+        panel: { icon: "dev", href: "dev.html", k: "nav.dev", gx: 14.5, gy: 39.3, pw: 27, rot: -4 } }
 };
