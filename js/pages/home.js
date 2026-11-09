@@ -1,5 +1,5 @@
 /* Бош саҳифа */
-Z.start("home", function () {
+Z.register("home", function () {
   var t = Z.t, e = Z.esc, I = Z.ICON;
   function tile(href, big, key) {
     return '<a class="tile" href="' + href + '"><span class="tile-ic">' + Z.BIG[big] + '</span><span class="tile-lb">' + e(t(key)) + "</span></a>";

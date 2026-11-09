@@ -19,7 +19,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { background: var(--o2); scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { background: var(--o2); overflow-x: clip; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   color: var(--ink);
   font-family: system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -34,8 +34,12 @@ body::before {
     radial-gradient(600px 400px at -10% 110%, rgba(223, 59, 36, .55), transparent 60%),
     linear-gradient(160deg, var(--o1) 0%, var(--o2) 55%, var(--o3) 100%);
 }
-main { flex: 1; transition: opacity .25s var(--ease), transform .25s var(--ease); animation: enter .7s var(--ease) both; }
+main { flex: 1; transition: opacity .25s var(--ease), transform .25s var(--ease); }
+main.enter { animation: enter .7s var(--ease) both; }
 main.swap { animation: swap .45s var(--ease) both; }
+main.opening { transition: none; animation: openIn .65s var(--ease) both; }
+main.closing { transition: transform .33s cubic-bezier(.55, 0, .85, .35), opacity .3s ease-in; transform: scale(.16); opacity: 0; }
+@keyframes openIn { from { transform: scale(.16); opacity: 0; } 55% { opacity: 1; } to { transform: none; opacity: 1; } }
 body.leaving main { opacity: 0; transform: translateY(-8px); }
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
@@ -307,3 +311,98 @@ a.work:hover .play { transform: scale(1.1); }
 @media (hover: hover) { .opt:hover .opt-go { transform: translateX(3px); } }
 .work[data-cat="game"] .thumb { background: radial-gradient(circle at 50% 0%, rgba(255, 154, 43, .3), transparent 60%), linear-gradient(135deg, #2b2640, #121520); }
 html { scroll-padding-top: 76px; }
+
+/* ================= Пуфаклар (қолган 2 категория) ================= */
+:root { --dock: 44px; }
+@media (min-width: 700px) { :root { --dock: 74px; } }
+.dock { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+.bub {
+  position: fixed; top: 50%; width: 36px; height: 36px; margin-top: -18px; padding: 6px; pointer-events: auto;
+  border-radius: 13px; background: radial-gradient(circle at 30% 18%, #323a5c, #121520 70%);
+  border: 1px solid rgba(255, 170, 80, .55);
+  box-shadow: 0 8px 20px rgba(18, 21, 32, .45), 0 0 18px rgba(255, 154, 43, .5), inset 0 1px 0 rgba(255, 235, 210, .25);
+  animation: bob 5s ease-in-out infinite; -webkit-tap-highlight-color: transparent;
+}
+.bub.l { left: calc(4px + env(safe-area-inset-left)); }
+.bub.r { right: calc(4px + env(safe-area-inset-right)); animation-delay: -2.5s; }
+.bub svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 4px rgba(255, 154, 43, .6)); }
+.bub::before { content: ""; position: absolute; inset: -8px; border-radius: 20px; }
+.bub::after { content: ""; position: absolute; inset: -3px; border-radius: 16px; border: 1px solid rgba(255, 154, 43, .6); animation: ring 3.2s ease-out infinite; pointer-events: none; }
+.bub.r::after { animation-delay: -1.6s; }
+.bub:active { filter: brightness(1.2); }
+.bub.launch { animation: launch .33s ease-in forwards; }
+.bub.pop { animation: pop .6s var(--spring) both, bob 5s ease-in-out .6s infinite; }
+@keyframes bob { 0%, 100% { transform: translateY(-6px); } 50% { transform: translateY(6px); } }
+@keyframes ring { 0% { opacity: .75; transform: scale(.96); } 100% { opacity: 0; transform: scale(1.55); } }
+@keyframes launch { to { transform: scale(1.6); opacity: 0; } }
+@keyframes pop { from { transform: scale(.2); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (min-width: 700px) {
+  .bub { width: 54px; height: 54px; margin-top: -27px; padding: 9px; border-radius: 18px; }
+  .bub.l { left: calc(12px + env(safe-area-inset-left)); }
+  .bub.r { right: calc(12px + env(safe-area-inset-right)); }
+}
+/* Пуфаклар учун жой ажратилади: матн ва тугмалар уларнинг остига кирмайди */
+@media (max-width: 1199px) {
+  body.has-dock main .wrap, body.has-dock .site-footer .wrap {
+    padding-left: calc(var(--dock) + env(safe-area-inset-left)); padding-right: calc(var(--dock) + env(safe-area-inset-right));
+  }
+}
+@media (max-width: 699px) {
+  body.has-dock .opt { gap: 10px; padding: 12px; }
+  body.has-dock .opt-ic { width: 42px; height: 42px; border-radius: 13px; }
+  body.has-dock .opt-ic svg { width: 22px; height: 22px; }
+  body.has-dock .opt-go { width: 30px; height: 30px; }
+  body.has-dock .opt-tx b { font-size: .95rem; }
+  body.has-dock .cat-ic { width: 56px; height: 56px; padding: 10px; border-radius: 18px; }
+  body.has-dock .cat-head { gap: 12px; }
+}
+
+/* ================= Нур ва ялтироқлик ================= */
+/* Фонда секин кўчадиган ёруғлик */
+body::after {
+  content: ""; position: fixed; z-index: -1; pointer-events: none; width: 130vmax; height: 130vmax; left: -35vmax; top: -70vmax;
+  background: radial-gradient(closest-side, rgba(255, 238, 196, .42), rgba(255, 220, 150, .12) 55%, transparent 72%);
+  animation: drift 20s ease-in-out infinite alternate; will-change: transform;
+}
+@keyframes drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(26vmax, 22vmax, 0); } }
+
+/* Ялтироқ (глянец) юзалар: юқорида ёруғлик, чегарада ёритма */
+.card, .opt, .work, .cta-box, .ask {
+  background-image: linear-gradient(180deg, rgba(255, 236, 214, .09), rgba(255, 236, 214, 0) 42%);
+  box-shadow: inset 0 1px 0 rgba(255, 236, 214, .16), 0 14px 34px rgba(18, 21, 32, .24);
+}
+.cta-box { background-image: radial-gradient(circle at 50% -30%, rgba(255, 154, 43, .4), transparent 62%), linear-gradient(180deg, rgba(255, 236, 214, .08), transparent 40%); }
+.ask { box-shadow: inset 0 1px 0 rgba(255, 236, 214, .18), 0 0 0 1px rgba(255, 170, 80, .3), 0 0 32px rgba(255, 154, 43, .3), 0 14px 34px rgba(18, 21, 32, .25); }
+.tile {
+  border-color: rgba(255, 170, 80, .35);
+  box-shadow: inset 0 1px 0 rgba(255, 236, 214, .2), 0 0 0 1px rgba(255, 170, 80, .14), 0 0 34px rgba(255, 140, 40, .22), 0 16px 34px rgba(18, 21, 32, .3);
+}
+@media (hover: hover) { .tile:hover { box-shadow: inset 0 1px 0 rgba(255, 236, 214, .25), 0 0 0 1px rgba(255, 190, 110, .4), 0 0 48px rgba(255, 150, 50, .4), 0 26px 48px rgba(18, 21, 32, .4); } }
+.tile-ic svg, .cat-ic svg { filter: drop-shadow(0 0 9px rgba(255, 154, 43, .65)); }
+.opt-ic, .icon { box-shadow: inset 0 0 0 1px rgba(255, 170, 80, .25), 0 0 16px rgba(255, 154, 43, .22); }
+.logo img { box-shadow: 0 0 16px rgba(255, 154, 43, .55); }
+.hero-logo { box-shadow: 0 22px 50px rgba(18, 21, 32, .35), 0 0 70px rgba(255, 205, 120, .6); }
+.play { box-shadow: 0 0 26px rgba(253, 229, 192, .55); }
+
+/* Тугмаларда ўтиб турувчи ёруғлик чизиғи */
+.btn { position: relative; overflow: hidden; }
+.btn.primary::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(110deg, transparent 38%, rgba(255, 255, 255, .38) 50%, transparent 62%);
+  transform: translateX(-130%); animation: shine 5s ease-in-out infinite;
+}
+@keyframes shine { 0%, 60% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+
+/* Ярқираш (юлдузчалар) */
+.hero { position: relative; }
+.hero::before, .hero::after {
+  content: ""; position: absolute; width: 16px; height: 16px; background: #fff7de; opacity: 0; pointer-events: none;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  animation: twinkle 3.8s ease-in-out infinite; filter: drop-shadow(0 0 6px #fff);
+}
+.hero::before { right: 22%; top: 12px; }
+.hero::after { right: 9%; top: 30px; width: 11px; height: 11px; animation-delay: 1.6s; }
+@keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 50% { opacity: 1; transform: scale(1.15) rotate(45deg); } }
+@media (min-width: 820px) { .hero::before { right: 34%; top: 40px; } .hero::after { right: 6%; top: 90px; } }
+
+@media (prefers-reduced-motion: reduce) { body::after, .btn.primary::after, .bub::after { animation: none !important; } }

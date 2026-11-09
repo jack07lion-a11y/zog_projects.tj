@@ -1,5 +1,5 @@
 /* Dev & Game саҳифаси */
-Z.start("dev", function () {
+Z.register("dev", function () {
   return Z.catHead(Z.BIG.dev, "nav.dev", "dev.lead") +
     Z.grid([
       Z.opt({ href: "#games", icon: "game", title: "opt.play", desc: "opt.desc.play" }),

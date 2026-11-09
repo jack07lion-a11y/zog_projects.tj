@@ -267,16 +267,93 @@
     });
   }
 
-  function render(fromLang) {
-    renderHeader();
+  function safeView() {
+    try { return Z.views[Z.page](); }
+    catch (err) { return '<div class="wrap" style="padding:30px 16px"><b>Xato / Ошибка:</b> ' + esc(err && err.message || err) + "</div>"; }
+  }
+  function playApp(cls, ms) {
     var app = document.getElementById("app");
-    try { app.innerHTML = Z.view(); }
-    catch (err) { app.innerHTML = '<div class="wrap" style="padding:30px 16px"><b>Xato / Ошибка:</b> ' + esc(err && err.message || err) + "</div>"; }
-    app.classList.toggle("swap", !!fromLang);
-    renderFooter();
-    updateMeta();
+    app.classList.remove("enter", "swap", "opening");
+    if (reduce) return;
+    void app.offsetWidth;
+    app.classList.add(cls);
+    setTimeout(function () { app.classList.remove(cls); }, ms);
+  }
+
+  /* ---------- Категория "пуфаклари" (чап/ўнг чеккада) ---------- */
+  var CATS = {
+    anim: { href: "animation.html", big: "anim", label: "nav.anim" },
+    promo: { href: "promotion.html", big: "promo", label: "nav.promo" },
+    dev: { href: "dev.html", big: "dev", label: "nav.dev" }
+  };
+  var ORDERC = ["anim", "promo", "dev"];
+  var slots = null, switching = false;
+  function initDock(p) {
+    if (!CATS[p]) { slots = null; document.body.classList.remove("has-dock"); return; }
+    slots = ORDERC.filter(function (c) { return c !== p; });
+    document.body.classList.add("has-dock");
+  }
+  function bubHTML(i) {
+    var c = CATS[slots[i]], label = esc(t(c.label));
+    return '<a class="bub ' + (i ? "r" : "l") + '" href="' + c.href + '" data-dock="' + slots[i] + '" aria-label="' + label + '" title="' + label + '">' + Z.BIG[c.big] + "</a>";
+  }
+  function renderDock() {
+    var d = document.getElementById("dock");
+    if (!slots) { if (d) d.remove(); return; }
+    if (!d) {
+      d = document.createElement("nav"); d.id = "dock"; d.className = "dock"; d.setAttribute("aria-label", "Categories");
+      document.body.appendChild(d);
+    }
+    d.innerHTML = bubHTML(0) + bubHTML(1);
+  }
+  function renderAll() {
+    renderHeader();
+    document.getElementById("app").innerHTML = safeView();
+    renderFooter(); renderDock(); updateMeta();
+  }
+  function render(fromLang) {
+    renderAll();
+    playApp(fromLang ? "swap" : "enter", 900);
     setupReveal(!!fromLang);
   }
+
+  /* Категориялар орасида силлиқ ўтиш: эскиси пуфак ўрнига "йиғилади", янгиси ўша жойдан "очилади" */
+  function switchCat(to) {
+    var from = Z.page;
+    if (!slots || !CATS[to] || to === from || switching) return;
+    var i = slots.indexOf(to); if (i < 0) return;
+    var app = document.getElementById("app");
+    var bub = document.querySelector('.bub[data-dock="' + to + '"]');
+    function swap() {
+      slots[i] = from; Z.page = to;
+      try { history.pushState({ cat: to }, "", CATS[to].href); } catch (e) {}
+      window.scrollTo(0, 0);
+      renderHeader();
+      app.innerHTML = safeView();
+      renderFooter(); updateMeta();
+      var side = ".bub." + (i ? "r" : "l"), el = document.querySelector(side);
+      if (el) { el.outerHTML = bubHTML(i); el = document.querySelector(side); if (el && !reduce) el.classList.add("pop"); }
+    }
+    if (reduce || !bub) { swap(); return; }
+    switching = true;
+    var r = bub.getBoundingClientRect(), ar = app.getBoundingClientRect();
+    app.style.transformOrigin = (r.left + r.width / 2 - ar.left) + "px " + (r.top + r.height / 2 - ar.top) + "px";
+    bub.classList.add("launch");
+    app.classList.remove("enter", "swap", "opening");
+    app.classList.add("closing");
+    setTimeout(function () {
+      swap();
+      app.classList.remove("closing");
+      playApp("opening", 700);
+      switching = false;
+    }, 330);
+  }
+  window.addEventListener("popstate", function () {
+    var name = location.pathname.split("/").pop(), p = null;
+    for (var k in CATS) { if (CATS[k].href === name) p = k; }
+    if (p && slots) { if (p !== Z.page) { Z.page = p; initDock(p); renderAll(); window.scrollTo(0, 0); playApp("swap", 900); } }
+    else location.reload();
+  });
 
   /* Кутилмаган хато бўлса, экранда кўрсатамиз (тузатиш осон бўлсин) */
   window.addEventListener("error", function (e) {
@@ -286,11 +363,17 @@
     }
   });
 
-  /* Саҳифа скрипти шуни чақиради */
-  Z.start = function (page, view) {
-    Z.page = page; Z.view = view;
+  /* Ҳар саҳифа скрипти ўз кўринишини шу ерда рўйхатдан ўтказади */
+  Z.views = {};
+  Z.register = function (page, view) { Z.views[page] = view; };
+  function boot() {
+    var p = document.body.getAttribute("data-page");
+    if (!Z.views[p]) return;
+    Z.page = p; initDock(p);
     loadLang(lang).then(function (ok) { lang = ok; render(false); });
-  };
+  }
+  /* defer-скриптлар ишлаб бўлгач (DOMContentLoaded) бошланади, шунда ҳамма саҳифа скрипти рўйхатдан ўтган бўлади */
+  if (document.readyState === "complete") boot(); else document.addEventListener("DOMContentLoaded", boot);
 
   document.addEventListener("click", function (e) {
     var box = document.querySelector(".lang");
@@ -305,7 +388,10 @@
   /* Саҳифалар орасида силлиқ ўтиш */
   document.addEventListener("click", function (e) {
     var a = e.target.closest && e.target.closest("a[href]");
-    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button || a.target === "_blank" || reduce) return;
+    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    var d = a.getAttribute("data-dock");
+    if (d) { e.preventDefault(); switchCat(d); return; }
+    if (a.target === "_blank" || reduce) return;
     var h = a.getAttribute("href");
     if (!h || h.charAt(0) === "#" || /^(https?:|mailto:|tel:)/.test(h)) return;
     e.preventDefault();

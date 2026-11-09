@@ -1,5 +1,5 @@
 /* Буюртма саҳифаси */
-Z.start("order", function () {
+Z.register("order", function () {
   var t = Z.t, e = Z.esc;
   return '<div class="page-head"><div class="wrap"><h1>' + e(t("order.title")) + "</h1><p>" + e(t("order.lead")) + "</p></div></div>" +
     '<section><div class="wrap"><h2 class="sub-h">' + e(t("order.pick")) + "</h2></div></section>" +
