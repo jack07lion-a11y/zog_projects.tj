@@ -47,6 +47,8 @@
   var K = 36, CD = 2.3, KY = 52, G = 0.85, LIM = 32;      /* пружина қаттиқлиги, сўниш, тик йўналишда қаттиқроқ, инерция кучи, энг катта силжиш (px) */
   var CORNERS = [[0.16, 0.14], [0.84, 0.14], [0.16, 0.86], [0.84, 0.86]];
   var tiles = [], loop = 0, last = 0;
+  var MS = 115;                    /* телефон тезланиши (м/с²) → пиксел/с² */
+  var ext = { x: 0, y: 0, t: 0 };        /* телефоннинг ҳозирги тезланиши (экран координаталарида, px/с²) */
   Z.tilesState = function () { return tiles.map(function (T) { return { x: T.x, y: T.y }; }); };   /* синов учун */
 
   function el(name, cls) { var n = document.createElementNS(NS, name); if (cls) n.setAttribute("class", cls); return n; }
@@ -105,6 +107,7 @@
     loop = requestAnimationFrame(frame);
     var dt = (now - last) / 1000; last = now;
     if (!(dt > 0)) return; if (dt > 1 / 30) dt = 1 / 30;
+    if (now - ext.t > 90) { var dk = Math.exp(-dt * 14); ext.x *= dk; ext.y *= dk; }   /* сенсордан янги маълумот келмаса, тезланиш нолга тушади */
     var i, T;
     for (i = 0; i < tiles.length; i++) { T = tiles[i]; var r = T.art.getBoundingClientRect(); T.cx = r.left + r.width / 2; T.cy = r.top + r.height / 2; }   /* аввал ўқиймиз */
     for (i = 0; i < tiles.length; i++) {
@@ -114,10 +117,11 @@
       var ax = clamp((vx - T.pvx) / dt, -7000, 7000), ay = clamp((vy - T.pvy) / dt, -7000, 7000);
       T.px = T.cx; T.py = T.cy; T.pvx = vx; T.pvy = vy;
       T.sax = T.sax * 0.45 + ax * 0.55; T.say = T.say * 0.45 + ay * 0.55;        /* қўлнинг тезланиши (шовқинсиз) */
+      var fax = T.sax + ext.x, fay = T.say + ext.y;                              /* + телефоннинг ўзи силкинса */
       var n = Math.ceil(dt / (1 / 120)), h = dt / n;
       for (var s = 0; s < n; s++) {                                              /* қўл рамкасида: инерция кучи = -тезланиш */
-        T.vx += (-K * T.x - CD * T.vx - G * T.sax) * h; T.x += T.vx * h;
-        T.vy += (-KY * T.y - CD * 1.1 * T.vy - G * T.say) * h; T.y += T.vy * h;
+        T.vx += (-K * T.x - CD * T.vx - G * fax) * h; T.x += T.vx * h;
+        T.vy += (-KY * T.y - CD * 1.1 * T.vy - G * fay) * h; T.y += T.vy * h;
       }
       T.x = clamp(T.x, -LIM, LIM); T.y = clamp(T.y, -LIM * 0.8, LIM * 0.8);
       draw(T, now);
@@ -129,6 +133,43 @@
   var rz = 0;
   window.addEventListener("resize", function () { clearTimeout(rz); rz = setTimeout(function () { tiles.forEach(function (T) { layout(T); draw(T, performance.now()); }); }, 120); });
 
+  /* ---------- 4) Телефонни силкитиш ---------- */
+  var gx = 0, gy = 0, gotMotion = false, motionGranted = false;
+  function screenVec(dx, dy) {                       /* қурилма координаталари → экран (ориентацияга қараб) */
+    var ang = (screen.orientation && typeof screen.orientation.angle === "number") ? screen.orientation.angle : (window.orientation || 0);
+    ang = ((ang % 360) + 360) % 360;
+    if (ang === 90) return [-dy, -dx];
+    if (ang === 180) return [-dx, dy];
+    if (ang === 270) return [dy, dx];
+    return [dx, -dy];
+  }
+  window.addEventListener("devicemotion", function (e) {
+    if (reduce) return;
+    var a = e.acceleration, ag = e.accelerationIncludingGravity, dx, dy;
+    if (a && a.x != null) { dx = a.x; dy = a.y; }
+    else if (ag && ag.x != null) { gx = gx * 0.9 + ag.x * 0.1; gy = gy * 0.9 + ag.y * 0.1; dx = ag.x - gx; dy = ag.y - gy; }   /* гравитацияни олиб ташлаш */
+    else return;
+    gotMotion = true; hideMotionBtn();
+    var v = screenVec(dx, dy);
+    ext.x = clamp(v[0] * MS, -2600, 2600); ext.y = clamp(v[1] * MS, -2600, 2600); ext.t = performance.now();
+  }, { passive: true });
+  function hideMotionBtn() { var b = document.querySelector(".motion-btn"); if (b) b.classList.add("hide"); }
+  function needsPermission() { return typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function"; }
+  function motionButton(stage) {
+    if (!needsPermission() || gotMotion || motionGranted || reduce) return;      /* фақат iPhone'да, рухсат ҳали берилмаган бўлса */
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "motion-btn hide";
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 8v8M20 8v8M2 10.5v3M22 10.5v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>' + Z.esc(Z.t("motion.enable")) + "</span>";
+    b.addEventListener("click", function () {
+      var reqs = [DeviceMotionEvent.requestPermission()];
+      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") reqs.push(DeviceOrientationEvent.requestPermission());
+      Promise.all(reqs).then(function (r) { if (r.indexOf("granted") > -1) { motionGranted = true; b.classList.add("hide"); } else b.classList.add("hide"); }, function () { b.classList.add("hide"); });
+    });
+    stage.appendChild(b);
+    /* сенсордан 1.4с давомида маълумот келмаса (iPhone: рухсат керак) тугмани кўрсатамиз; келса — керак эмас (Android) */
+    setTimeout(function () { if (!gotMotion && !motionGranted) b.classList.remove("hide"); }, 1400);
+  }
+
   Z.onRender(function () {
     stop();
     var stage = document.getElementById("stage");
@@ -136,6 +177,7 @@
     if (!stage) return;
     Array.prototype.forEach.call(stage.querySelectorAll(".art"), function (a) { arts.push({ el: a, k: parseFloat(a.getAttribute("data-k")) || 1 }); });
     buildTiles(stage);
+    motionButton(stage);
     gate(stage);
     start();
   });

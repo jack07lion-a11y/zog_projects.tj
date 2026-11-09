@@ -109,5 +109,7 @@
   "about.promotions": "SaaS promo va reklama",
   "about.dev": "O'yin va mobil ilova",
 
+  "motion.enable": "Qimirlashni yoqish",
+
   "footer.rights": "Barcha huquqlar himoyalangan."
 };
