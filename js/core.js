@@ -2,7 +2,18 @@
    js/content.js (ҳавола, ишлар) ва js/i18n/*.js (матнлар) да ўзгартиринг. */
 (function () {
   "use strict";
-  var S = window.SITE, Z = window.Z = { S: S };
+  var S = window.SITE || {}, Z = window.Z = { S: S };
+  /* Версия: шу файл ҳаволасидаги ?v=... ни тил файлларига ҳам беради (кэш аралашмасин) */
+  var VER = "";
+  try { var m = /[?&]v=([^&]+)/.exec(document.currentScript.src); VER = m ? "?v=" + m[1] : ""; } catch (e) {}
+  /* Эски кэшланган content.js бўлса ҳам сайт ишласин */
+  S.langs = S.langs || [
+    { code: "tg", name: "TJ", label: "Тоҷикӣ", htmlLang: "tg" }, { code: "ru", name: "RU", label: "Русский", htmlLang: "ru" },
+    { code: "uz", name: "UZ", label: "Oʻzbekcha", htmlLang: "uz" }, { code: "en", name: "EN", label: "English", htmlLang: "en" }
+  ];
+  S.defaultLang = S.defaultLang || "tg"; S.fallbackLang = S.fallbackLang || "en";
+  S.instagram = S.instagram || {}; S.whatsapp = S.whatsapp || "992907539527"; S.name = S.name || "ZOG Projects";
+  var loaded = {};
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var NAV = [
     ["home", "index.html", "nav.home"],
@@ -38,10 +49,10 @@
   /* Тил файли фақат керак бўлганда юкланади */
   function loadLang(l) {
     return new Promise(function (resolve) {
-      if (window.I18N && window.I18N[l]) return resolve(l);
+      if (loaded[l]) return resolve(l);
       var s = document.createElement("script");
-      s.src = "js/i18n/" + l + ".js";
-      s.onload = function () { resolve(l); };
+      s.src = "js/i18n/" + l + ".js" + VER;
+      s.onload = function () { loaded[l] = true; resolve(l); };
       s.onerror = function () {
         if (l !== S.defaultLang) loadLang(S.defaultLang).then(resolve); else resolve(l);
       };
@@ -259,12 +270,21 @@
   function render(fromLang) {
     renderHeader();
     var app = document.getElementById("app");
-    app.innerHTML = Z.view();
+    try { app.innerHTML = Z.view(); }
+    catch (err) { app.innerHTML = '<div class="wrap" style="padding:30px 16px"><b>Xato / Ошибка:</b> ' + esc(err && err.message || err) + "</div>"; }
     app.classList.toggle("swap", !!fromLang);
     renderFooter();
     updateMeta();
     setupReveal(!!fromLang);
   }
+
+  /* Кутилмаган хато бўлса, экранда кўрсатамиз (тузатиш осон бўлсин) */
+  window.addEventListener("error", function (e) {
+    var app = document.getElementById("app");
+    if (app && !app.children.length || (app && !document.querySelector("#app .wrap, #app section"))) {
+      app.innerHTML = '<div class="wrap" style="padding:30px 16px"><b>Xato / Ошибка:</b> ' + esc(e.message || "script") + "</div>";
+    }
+  });
 
   /* Саҳифа скрипти шуни чақиради */
   Z.start = function (page, view) {
