@@ -421,12 +421,44 @@ body[data-page="home"] main { height: calc(100vh - 64px); height: calc(100svh - 
     background: radial-gradient(500px 360px at 85% -5%, rgba(255, 224, 160, .55), transparent 62%), linear-gradient(160deg, var(--o1), var(--o2) 55%, var(--o3));
   }
 }
-.he { position: absolute; inset: 0; pointer-events: none; animation: handIn 1.35s cubic-bezier(.2, 1.05, .3, 1) calc(var(--i) * .22s + .15s) backwards; }
-@keyframes handIn { from { transform: translate3d(var(--fx), var(--fy), 0); opacity: 0; } to { transform: none; opacity: 1; } }
-.stage.still .he { animation: none; }
+/* Ҳар қўлнинг ўз тезлик эгри чизиғи (CapCut "curves" каби: тез келади, секин ўрнашади) */
+.he { position: absolute; inset: 0; pointer-events: none; animation: var(--an) var(--dur) var(--del) linear backwards; }
+.hi { animation: var(--an2) var(--dur) var(--del) linear backwards; }
+.c1 { --an: in1; --an2: pop1; --dur: 1.7s; --del: .15s; --fl: 6.5s; --fa: 7px; }
+.c2 { --an: in2; --an2: pop2; --dur: 2s; --del: .5s; --fl: 7.8s; --fa: 9px; }
+.c3 { --an: in3; --an2: pop3; --dur: 1.9s; --del: .85s; --fl: 8.6s; --fa: 6px; }
+.stage.still .he, .stage.still .hi { animation: none; }
+/* 1-қўл: "сакраб келиш" — жуда тез киради, охирида узоқ секинлашиб ўрнашади */
+@keyframes in1 {
+  0% { transform: translate3d(var(--fx), var(--fy), 0); opacity: 0; animation-timing-function: cubic-bezier(.06, .84, .16, 1); }
+  10% { opacity: 1; }
+  60% { transform: translate3d(calc(var(--fx) * -.04), calc(var(--fy) * -.04), 0); animation-timing-function: cubic-bezier(.45, 0, .2, 1); }
+  100% { transform: none; opacity: 1; }
+}
+/* 2-қўл: "қамчи" — секин суринади, кейин кескин отилади ва юмшоқ ўрнашади */
+@keyframes in2 {
+  0% { transform: translate3d(var(--fx), var(--fy), 0); opacity: 0; animation-timing-function: cubic-bezier(.45, 0, .85, .55); }
+  8% { opacity: 1; }
+  32% { transform: translate3d(calc(var(--fx) * .5), calc(var(--fy) * .5), 0); animation-timing-function: cubic-bezier(.2, 0, .05, 1); }
+  66% { transform: translate3d(calc(var(--fx) * -.06), calc(var(--fy) * -.06), 0); animation-timing-function: cubic-bezier(.4, 0, .2, 1); }
+  100% { transform: none; opacity: 1; }
+}
+/* 3-қўл: "пружина" — киради, ўтиб кетади, икки марта тебраниб тинчийди */
+@keyframes in3 {
+  0% { transform: translate3d(var(--fx), var(--fy), 0); opacity: 0; animation-timing-function: cubic-bezier(.1, .78, .22, 1); }
+  10% { opacity: 1; }
+  48% { transform: translate3d(calc(var(--fx) * -.08), calc(var(--fy) * -.08), 0); animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
+  70% { transform: translate3d(calc(var(--fx) * .02), calc(var(--fy) * .02), 0); animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
+  86% { transform: translate3d(calc(var(--fx) * -.006), calc(var(--fy) * -.006), 0); animation-timing-function: cubic-bezier(.4, 0, .4, 1); }
+  100% { transform: none; opacity: 1; }
+}
+/* Қўлнинг ўз ўқида сал бурилиб-ўрнашиши */
+@keyframes pop1 { 0% { transform: rotate(-7deg) scale(.95); animation-timing-function: cubic-bezier(.06, .84, .16, 1); } 60% { transform: rotate(1.4deg) scale(1.02); animation-timing-function: cubic-bezier(.45, 0, .2, 1); } 100% { transform: none; } }
+@keyframes pop2 { 0% { transform: rotate(9deg) scale(.94); animation-timing-function: cubic-bezier(.45, 0, .85, .55); } 66% { transform: rotate(-2deg) scale(1.025); animation-timing-function: cubic-bezier(.4, 0, .2, 1); } 100% { transform: none; } }
+@keyframes pop3 { 0% { transform: rotate(-8deg) scale(.95); animation-timing-function: cubic-bezier(.1, .78, .22, 1); } 48% { transform: rotate(2deg) scale(1.03); animation-timing-function: cubic-bezier(.4, 0, .4, 1); } 70% { transform: rotate(-.6deg) scale(.995); animation-timing-function: cubic-bezier(.4, 0, .4, 1); } 100% { transform: none; } }
 .hand { position: absolute; translate: -50% -50%; }
-.hf { animation: hfloat 7s ease-in-out infinite; animation-delay: calc(var(--i) * -2.3s); }
-@keyframes hfloat { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(.7deg); } }
+.hf { animation: hfloat var(--fl) ease-in-out infinite; animation-delay: calc(var(--i) * -2.3s); }
+@keyframes hfloat { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(calc(var(--fa) * -1)) rotate(.7deg); } }
 .art { transform: translate3d(calc(var(--mx) * 18px * var(--k)), calc(var(--my) * 14px * var(--k)), 0); }
 .art img { display: block; width: 100%; height: auto; filter: drop-shadow(0 12px 14px rgba(18, 21, 32, .2)); }
-@media (prefers-reduced-motion: reduce) { .hf { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .hf, .he, .hi { animation: none !important; } }
