@@ -109,7 +109,10 @@
   "about.promotions": "SaaS промо и реклама",
   "about.dev": "Игры и мобильные приложения",
 
-  "motion.enable": "Включить движение",
+  "pr.works": "Работы",
+  "pr.saas": "SaaS видео",
+  "pr.ad": "Реклама",
+  "pr.course": "Курс",
 
   "footer.rights": "Все права защищены."
 };

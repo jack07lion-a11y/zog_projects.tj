@@ -30,9 +30,9 @@ Z.register("home", function () {
     }
     /* Расм src билан эмас: уни hands.js юклайди (тўлиқ юкланмагунча анимация бошланмайди) */
     var img = '<img alt="" decoding="async" width="1200" height="' + Math.round(1200 / n(h.ar, 1.25)) + '" sizes="' + e(SIZES) + '" data-src="' + e(h.src) + '" data-srcset="' + e(h.srcset || "") + '"' + (h.f ? ' style="scale:-1 1"' : "") + ">";
-    return '<div class="he c' + (i % 3 + 1) + '" style="' + vars + '"><div class="hand" style="' + pos + '"><div class="hi"><div class="hf"><div class="art" data-k="' + ks + '" data-ar="' + n(h.ar, 1.25) + '">' + pn + img + "</div></div></div></div></div>";
+    return '<div class="he c' + (i % 3 + 1) + '" data-key="' + k + '" style="' + vars + '"><div class="hand" style="' + pos + '"><div class="hi"><div class="hf"><div class="art" data-k="' + ks + '" data-ar="' + n(h.ar, 1.25) + '">' + pn + img + "</div></div></div></div></div>";
   }
   /* h1/p — қидирув тизимлари ва экран ўқувчилар учун (кўринмайди) */
   return '<h1 class="sr">' + e(t("hero.title")) + '</h1><p class="sr">' + e(t("hero.sub")) + "</p>" +
-    '<div class="stage' + (Z.fromLang ? " still" : "") + '" id="stage"><div class="boot" aria-hidden="true"><i></i></div><div class="canvas">' + Object.keys(H).map(hand).join("") + "</div></div>";
+    '<div class="stage' + (Z.fromLang ? " still" : "") + '" id="stage" data-scene="home"><div class="boot" aria-hidden="true"><i></i></div><div class="canvas">' + Object.keys(H).map(hand).join("") + "</div></div>";
 });

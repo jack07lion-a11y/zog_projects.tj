@@ -476,13 +476,6 @@ html.nos body::after { animation: none; will-change: auto; }   /* бош саҳ�
 .pnl:active .glyph { scale: .92; }
 .pnl:active svg { scale: .92; }
 @media (hover: hover) { .pnl:hover svg, .pnl:hover .glyph { scale: 1.06; } }
-.motion-btn { position: absolute; left: 12px; bottom: 14px; z-index: 6; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 14px; border-radius: 999px;
-  border: 1px solid rgba(253, 229, 192, .25); background: rgba(18, 21, 32, .86); color: var(--cream); font: 700 .82rem/1 var(--ui, system-ui); cursor: pointer;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: opacity .3s, transform .3s var(--spring), visibility .3s; -webkit-tap-highlight-color: transparent; }
-.motion-btn svg { width: 18px; height: 18px; }
-.motion-btn:active { transform: scale(.94); }
-.motion-btn.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-.stage:not(.ready) .motion-btn { visibility: hidden; }
 .strings { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 2; pointer-events: none; }
 .strings .sh { fill: none; stroke: rgba(18, 21, 32, .3); stroke-width: 3.2; stroke-linecap: round; }
 .strings .st { fill: none; stroke: #fff4de; stroke-width: 1.5; stroke-linecap: round; }
@@ -490,3 +483,33 @@ html.nos body::after { animation: none; will-change: auto; }   /* бош саҳ�
 .strings .kn { fill: #fff4de; stroke: rgba(18, 21, 32, .55); stroke-width: 1; }
 .strings .ey { fill: none; stroke: #ffb066; stroke-width: 2; }
 @media (prefers-reduced-motion: reduce) { .stage .hf, .stage .he, .stage .hi, .boot i { animation: none !important; } .he { visibility: visible; } }
+
+/* ================= Promotion саҳнаси: қўғирчоқбоз қўли, иплар, осилган плиталар ================= */
+.stage.leaving .pnl, .stage.leaving .pitem { pointer-events: none; }
+.asm { position: absolute; inset: 0; visibility: hidden; will-change: transform; }
+.stage.ready .asm { visibility: visible; animation: asmIn 2.3s linear backwards; }
+.stage.still .asm { visibility: visible; animation: none; }
+/* Тепадан тушиш: аввал плиталар (энг пастдагиси) кўринади, кейин иплар, охирида қўл. Тез келиб, юмшоқ тўхтайди ва сал тебранади */
+@keyframes asmIn {
+  0% { transform: translate3d(0, -112%, 0); animation-timing-function: cubic-bezier(.1, .85, .2, 1); }
+  56% { transform: translate3d(0, 2.4%, 0); animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
+  78% { transform: translate3d(0, -.7%, 0); animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
+  100% { transform: none; }
+}
+.mh { position: absolute; pointer-events: none; z-index: 1; will-change: transform; }
+.mhf { width: 100%; height: 100%; animation: mhFloat 7.5s ease-in-out infinite; }
+.mhf img { display: block; width: 100%; height: 100%; }
+@keyframes mhFloat { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(.4deg); } }
+.mstr { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 2; pointer-events: none; }
+.mstr .sh { fill: none; stroke: rgba(18, 21, 32, .26); stroke-width: 3; stroke-linecap: round; }
+.mstr .st { fill: none; stroke: #b9694c; stroke-width: 1.6; stroke-linecap: round; }
+.mstr .st2 { fill: none; stroke: rgba(255, 228, 200, .5); stroke-width: .8; stroke-linecap: round; }
+.mstr .kn { fill: #d79d7c; stroke: rgba(18, 21, 32, .4); stroke-width: 1; }
+.pitem { position: absolute; left: 0; top: 0; z-index: var(--z, 3); display: block; transform-origin: 50% 0; will-change: transform; -webkit-tap-highlight-color: transparent; }
+.pitem .slab { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transition: scale .3s var(--spring); }
+.pi-logo { position: absolute; left: 14%; top: 19%; width: 21%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; color: #ffb066; background: rgba(255, 154, 43, .16); box-shadow: inset 0 0 0 1px rgba(255, 170, 80, .32); pointer-events: none; }
+.pi-logo svg { width: 62%; height: 62%; }
+.pi-txt { position: absolute; left: 11%; right: 9%; bottom: 14%; font-weight: 800; font-size: calc(var(--tw) * .16); line-height: 1.12; letter-spacing: -.01em; color: var(--cream); text-wrap: balance; text-shadow: 0 1px 2px rgba(0, 0, 0, .35); pointer-events: none; }
+.pitem:active .slab { scale: .93; }
+@media (hover: hover) { .pitem:hover .slab { scale: 1.06; } }
+@media (prefers-reduced-motion: reduce) { .asm { visibility: visible; animation: none !important; } .mhf { animation: none !important; } }

@@ -109,7 +109,10 @@
   "about.promotions": "SaaS promo and ads",
   "about.dev": "Games and mobile apps",
 
-  "motion.enable": "Enable motion",
+  "pr.works": "Works",
+  "pr.saas": "SaaS video",
+  "pr.ad": "Ad video",
+  "pr.course": "Course",
 
   "footer.rights": "All rights reserved."
 };

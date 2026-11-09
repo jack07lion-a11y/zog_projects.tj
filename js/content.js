@@ -110,3 +110,15 @@ window.HANDS = {
         x: 71.5, y: 86.2, w: 102, r: 0, f: 0, z: 3, fx: 70, fy: 90,
         panel: { icon: "dev", glyph: "assets/icons/dev-v1.webp", href: "dev.html", k: "nav.dev", ax: 10.8, ay: 22.2, bx: 9.6, by: 52.2, open: [-0.92, -0.39], pw: 21, rot: -8 } }
 };
+
+/* ---------- 5. ИЧКИ САҲНАЛАР РАСМЛАРИ (олдиндан юкланади) ----------
+   Promotion саҳнасидаги қўғирчоқбоз қўли. anchors — иплар боғланадиган бармоқ учлари (расм ўлчамининг %):
+   pinky — кичик бармоқ, middle — ўрта, index — кўрсаткич, thumb — бош бармоқ. */
+window.SCENE_ASSETS = {
+  promo: {
+    ar: 1.1873, sizes: "(min-aspect-ratio: 1/1) 52vh, 104vw",
+    src: "assets/promo/hand-v1.webp",
+    srcset: "assets/promo/hand-v1-600.webp 600w, assets/promo/hand-v1-900.webp 900w, assets/promo/hand-v1.webp 1200w",
+    anchors: { pinky: [7.5, 81.4], middle: [30.0, 68.7], index: [55.8, 61.0], thumb: [91.7, 74.3] }
+  }
+};

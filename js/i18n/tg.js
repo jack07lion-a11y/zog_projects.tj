@@ -109,7 +109,10 @@
   "about.promotions": "SaaS промо ва таблиғот",
   "about.dev": "Бозӣ ва барномаи мобилӣ",
 
-  "motion.enable": "Ҷунбишро фаъол кунед",
+  "pr.works": "Корҳо",
+  "pr.saas": "SaaS видео",
+  "pr.ad": "Таблиғот",
+  "pr.course": "Курс",
 
   "footer.rights": "Ҳамаи ҳуқуқҳо ҳифз шудаанд."
 };

@@ -109,7 +109,10 @@
   "about.promotions": "SaaS promo va reklama",
   "about.dev": "O'yin va mobil ilova",
 
-  "motion.enable": "Qimirlashni yoqish",
+  "pr.works": "Ishlar",
+  "pr.saas": "SaaS video",
+  "pr.ad": "Reklama",
+  "pr.course": "Kurs",
 
   "footer.rights": "Barcha huquqlar himoyalangan."
 };

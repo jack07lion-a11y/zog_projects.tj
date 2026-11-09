@@ -353,19 +353,122 @@
       switching = false;
     }, 330);
   }
-  window.addEventListener("popstate", function () {
-    var name = location.pathname.split("/").pop(), p = null;
-    for (var k in CATS) { if (CATS[k].href === name) p = k; }
-    if (p && slots) { if (p !== Z.page) { Z.page = p; initDock(p); renderAll(); window.scrollTo(0, 0); playApp("swap", 900); } }
-    else location.reload();
-  });
-
   /* Кутилмаган хато бўлса, экранда кўрсатамиз (тузатиш осон бўлсин) */
   window.addEventListener("error", function (e) {
     var app = document.getElementById("app");
     if (app && !app.children.length || (app && !document.querySelector("#app .wrap, #app section"))) {
       app.innerHTML = '<div class="wrap" style="padding:30px 16px"><b>Xato / Ошибка:</b> ' + esc(e.message || "script") + "</div>";
     }
+  });
+
+  /* Расмлар тўлиқ юкланиб, декодланмагунча кутади; юкланмаса (интернет йўқ) тикланганда ўзи қайта уринади */
+  Z.waitImages = function (imgs, cb) {
+    var left = imgs.length;
+    if (!left) { cb(); return; }
+    function one() { if (--left === 0) cb(); }
+    imgs.forEach(function (img) {
+      var attempt = 0, done = false, timer = 0;
+      function start() {
+        var ss = img.getAttribute("data-srcset") || "", sr = img.getAttribute("data-src") || "";
+        if (attempt) { ss = ss.replace(/\.webp(\s|$)/g, ".webp?r=" + attempt + "$1"); sr = sr.replace(/\.webp$/, ".webp?r=" + attempt); }
+        if (ss) img.srcset = ss;
+        img.src = sr;
+      }
+      function ok() { if (done) return; done = true; (img.decode ? img.decode().catch(function () {}) : Promise.resolve()).then(one); }
+      function fail() {
+        if (done) return; clearTimeout(timer); attempt++;
+        var go = function () { window.removeEventListener("online", go); clearTimeout(timer); if (!done) start(); };
+        window.addEventListener("online", go); timer = setTimeout(go, Math.min(1500 * attempt, 8000));
+      }
+      img.addEventListener("load", ok); img.addEventListener("error", fail); start();
+    });
+  };
+
+  /* ---------- Умумий сенсорлар (бармоқ/сичқонча, телефон эгилиши, силкиниши) ---------- */
+  var sens = Z.sensors = { tx: 0, ty: 0, ax: 0, ay: 0, at: 0, got: false };
+  var mgx = 0, mgy = 0;
+  function nclamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  window.addEventListener("pointermove", function (e) { if (reduce) return; sens.tx = (e.clientX / window.innerWidth - 0.5) * 2; sens.ty = (e.clientY / window.innerHeight - 0.5) * 2; }, { passive: true });
+  window.addEventListener("deviceorientation", function (e) { if (reduce || e.gamma == null) return; sens.tx = nclamp(e.gamma / 22, -1, 1); sens.ty = nclamp((e.beta - 45) / 22, -1, 1); }, { passive: true });
+  function screenVec(dx, dy) {                       /* қурилма координаталари → экран (ориентацияга қараб) */
+    var ang = (screen.orientation && typeof screen.orientation.angle === "number") ? screen.orientation.angle : (window.orientation || 0);
+    ang = ((ang % 360) + 360) % 360;
+    if (ang === 90) return [-dy, -dx];
+    if (ang === 180) return [-dx, dy];
+    if (ang === 270) return [dy, dx];
+    return [dx, -dy];
+  }
+  window.addEventListener("devicemotion", function (e) {
+    if (reduce) return;
+    var a = e.acceleration, ag = e.accelerationIncludingGravity, dx, dy;
+    if (a && a.x != null) { dx = a.x; dy = a.y; }
+    else if (ag && ag.x != null) { mgx = mgx * 0.9 + ag.x * 0.1; mgy = mgy * 0.9 + ag.y * 0.1; dx = ag.x - mgx; dy = ag.y - mgy; }
+    else return;
+    var v = screenVec(dx, dy);
+    sens.ax = nclamp(v[0] * 115, -2600, 2600); sens.ay = nclamp(v[1] * 115, -2600, 2600); sens.at = performance.now(); sens.got = true;
+  }, { passive: true });
+  /* Силкиниш кучи: янги маълумот келмаса, секин нолга тушади */
+  Z.shake = function (now) { var d = now - sens.at, k = d > 90 ? Math.exp(-(d - 90) / 1000 * 14) : 1; return { x: sens.ax * k, y: sens.ay * k }; };
+
+  /* ---------- Саҳналар (Home, Promotion, Animation, Code) орасида битта саҳифадек ўтиш ----------
+     Ҳар саҳна алоҳида HTML ва кичик скриптда, лекин ўтишда саҳифа қайта юкланмайди. */
+  var SCENES = {
+    home: { href: "index.html", scripts: ["js/hands.js", "js/pages/home.js"] },
+    anim: { href: "animation.html", scripts: ["js/pages/anim.js"] },
+    promo: { href: "promotion.html", scripts: ["js/pages/promo.js"] },
+    dev: { href: "dev.html", scripts: ["js/pages/dev.js"] }
+  };
+  Z.SCENES = SCENES; Z.exits = {};
+  var loadedScripts = {}, navBusy = false;
+  function loadScript(src) {
+    if (loadedScripts[src]) return loadedScripts[src];
+    if (document.querySelector('script[src^="' + src + '"]')) return (loadedScripts[src] = Promise.resolve());
+    loadedScripts[src] = new Promise(function (res, rej) {
+      var el = document.createElement("script"); el.src = src + (Z.ver || ""); el.onload = res;
+      el.onerror = function () { delete loadedScripts[src]; rej(); }; document.head.appendChild(el);
+    });
+    return loadedScripts[src];
+  }
+  function sceneByHref(h) {
+    var name = String(h || "").split("#")[0].split("?")[0].split("/").pop();
+    if (name === "" || name === ".") name = "index.html";
+    for (var k in SCENES) { if (SCENES[k].href === name) return k; }
+    return null;
+  }
+  function renderScene() {
+    Z.fromLang = false; initDock(Z.page);
+    renderHeader();
+    var app = document.getElementById("app");
+    app.classList.remove("enter", "swap", "opening");
+    app.innerHTML = safeView();
+    renderFooter(); renderDock(); updateMeta();
+    Z.hooks.forEach(function (fn) { try { fn(); } catch (e) {} });
+  }
+  function warmScene(to) {                                   /* келаётган саҳна расмини олдиндан декодлаймиз (чиқиш анимацияси давомида) */
+    var a = (window.SCENE_ASSETS || {})[to]; if (!a) return;
+    try { var im = new Image(); im.sizes = a.sizes; im.srcset = a.srcset; im.src = a.src; if (im.decode) im.decode().catch(function () {}); } catch (e) {}
+  }
+  Z.nav = function (to, opts) {
+    opts = opts || {};
+    var from = Z.page;
+    if (!SCENES[to] || !SCENES[from] || to === from || navBusy) return false;
+    navBusy = true; warmScene(to);
+    function go() {
+      Promise.all(SCENES[to].scripts.map(loadScript)).then(function () {
+        Z.page = to;
+        if (!opts.pop) { try { history.pushState({ scene: to }, "", SCENES[to].href); } catch (e) {} }
+        window.scrollTo(0, 0);
+        renderScene(); navBusy = false;
+      }, function () { navBusy = false; location.href = SCENES[to].href; });
+    }
+    var ex = Z.exits[from];
+    if (ex && !reduce) ex(go, { to: to, from: from }); else go();
+    return true;
+  };
+  window.addEventListener("popstate", function () {
+    var to = sceneByHref(location.pathname);
+    if (to && SCENES[Z.page]) { if (to !== Z.page) Z.nav(to, { pop: true }); }
+    else location.reload();
   });
 
   /* Ҳар саҳифа скрипти ўз кўринишини шу ерда рўйхатдан ўтказади */
@@ -396,9 +499,12 @@
     if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
     var d = a.getAttribute("data-dock");
     if (d) { e.preventDefault(); switchCat(d); return; }
-    if (a.target === "_blank" || reduce) return;
+    if (a.target === "_blank") return;
     var h = a.getAttribute("href");
     if (!h || h.charAt(0) === "#" || /^(https?:|mailto:|tel:)/.test(h)) return;
+    var sc = sceneByHref(h);
+    if (sc && SCENES[Z.page]) { e.preventDefault(); if (sc !== Z.page) Z.nav(sc); return; }     /* саҳна ичида: саҳифани қайта юкламасдан */
+    if (reduce) return;
     e.preventDefault();
     document.body.classList.add("leaving");
     setTimeout(function () { location.href = a.href; }, 220);

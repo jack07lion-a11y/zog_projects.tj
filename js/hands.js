@@ -1,14 +1,12 @@
-/* Қўллар: (1) юклашни назорат қилиш — секин интернетда қотмаслик;
-           (2) енгил параллакс;
-           (3) иконкаларнинг физикаси: иконка икки ип билан бармоқ учларига боғланган, қўл тез келиб тўхтаганда
-               инерциядан орқага силжиб, пружинадек чайқалиб тинчийди. */
+/* Бош саҳна (3 та қўл): юклашни назорат қилиш, параллакс, иконка физикаси, қайтиш (чиқиш) анимацияси.
+   Сенсорлар (эгилиш, силкиниш) core.js даги Z.sensors дан олинади. Рухсат сўрайдиган тугма йўқ. */
 (function () {
   "use strict";
   var Z = window.Z; if (!Z) return;
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var NS = "http://www.w3.org/2000/svg";
 
-  /* ---------- 1) Юклаш ---------- */
+  /* ---------- 1) Юклаш: ҳамма расм тайёр бўлгунча ҳеч нарса кўринмайди ---------- */
   function startImg(img, attempt) {
     var ss = img.getAttribute("data-srcset") || "", s = img.getAttribute("data-src") || "";
     if (attempt) { ss = ss.replace(/\.webp(\s|$)/g, ".webp?r=" + attempt + "$1"); s = s.replace(/\.webp$/, ".webp?r=" + attempt); }
@@ -32,34 +30,38 @@
     });
   }
 
-  /* ---------- 2) Параллакс ---------- */
-  var arts = [], tx = 0, ty = 0, cx = 0, cy = 0, praf = 0;
-  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-  function papply() {
-    for (var i = 0; i < arts.length; i++) arts[i].el.style.transform = "translate3d(" + (cx * 18 * arts[i].k).toFixed(2) + "px," + (cy * 14 * arts[i].k).toFixed(2) + "px,0)";
+  /* ---------- 2) Бошқа саҳналарни олдиндан юклаш (тинч вақтда, интернет секин бўлмаса) ---------- */
+  var prefetched = false;
+  function prefetch() {
+    if (prefetched) return; prefetched = true;
+    var c = navigator.connection;
+    if (c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ""))) return;
+    var v = Z.ver || "", list = ["animation.html", "promotion.html", "dev.html", "js/pages/anim.js" + v, "js/pages/promo.js" + v, "js/pages/dev.js" + v];
+    var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1500); };
+    idle(function () {
+      list.forEach(function (u) { try { fetch(u, { credentials: "same-origin" }).catch(function () {}); } catch (e) {} });
+      var SA = window.SCENE_ASSETS || {};
+      Object.keys(SA).forEach(function (k) {            /* саҳна расмлари: браузер ўзи тўғри ўлчамни танлайди */
+        var im = new Image(); try { im.fetchPriority = "low"; } catch (e) {}
+        im.sizes = SA[k].sizes; im.srcset = SA[k].srcset; im.src = SA[k].src;
+      });
+    });
   }
-  function ptick() { cx += (tx - cx) * 0.08; cy += (ty - cy) * 0.08; papply(); praf = (Math.abs(tx - cx) > 0.002 || Math.abs(ty - cy) > 0.002) ? requestAnimationFrame(ptick) : 0; }
-  function pkick() { if (!praf && arts.length) praf = requestAnimationFrame(ptick); }
-  window.addEventListener("pointermove", function (e) { if (!arts.length || reduce) return; tx = (e.clientX / window.innerWidth - 0.5) * 2; ty = (e.clientY / window.innerHeight - 0.5) * 2; pkick(); }, { passive: true });
-  window.addEventListener("deviceorientation", function (e) { if (!arts.length || reduce || e.gamma == null) return; tx = clamp(e.gamma / 22, -1, 1); ty = clamp((e.beta - 45) / 22, -1, 1); pkick(); }, { passive: true });
 
   /* ---------- 3) Иконка + иплар + физика ---------- */
-  var K = 36, CD = 2.3, KY = 52, G = 0.85, LIM = 32;      /* пружина қаттиқлиги, сўниш, тик йўналишда қаттиқроқ, инерция кучи, энг катта силжиш (px) */
+  var K = 36, CD = 2.3, KY = 52, G = 0.85, LIM = 32;
   var CORNERS = [[0.16, 0.14], [0.84, 0.14], [0.16, 0.86], [0.84, 0.86]];
-  var tiles = [], loop = 0, last = 0;
-  var MS = 115;                    /* телефон тезланиши (м/с²) → пиксел/с² */
-  var ext = { x: 0, y: 0, t: 0 };        /* телефоннинг ҳозирги тезланиши (экран координаталарида, px/с²) */
+  var arts = [], tiles = [], loop = 0, last = 0, cx = 0, cy = 0;
   Z.tilesState = function () { return tiles.map(function (T) { return { x: T.x, y: T.y }; }); };   /* синов учун */
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
   function el(name, cls) { var n = document.createElementNS(NS, name); if (cls) n.setAttribute("class", cls); return n; }
   function layout(T) {
     var art = T.art, W = art.offsetWidth, d = T.d, H = W / (parseFloat(art.getAttribute("data-ar")) || 1.25);
-    T.W = W; T.H = H;
-    T.tw = d.pw / 100 * W; T.th = T.tw * 164 / 162;
+    T.W = W; T.H = H; T.tw = d.pw / 100 * W; T.th = T.tw * 164 / 162;
     T.pn.style.width = T.tw + "px"; T.pn.style.height = T.th + "px";
     T.A = [d.ax / 100 * W, d.ay / 100 * H]; T.B = [d.bx / 100 * W, d.by / 100 * H];
-    T.c = [(T.A[0] + T.B[0]) / 2 + d.ox * d.shift * W, (T.A[1] + T.B[1]) / 2 + d.oy * d.shift * W];   /* тинч ҳолатдаги марказ */
-    /* ип боғланадиган бурчаклар: ҳар бармоққа энг яқини */
+    T.c = [(T.A[0] + T.B[0]) / 2 + d.ox * d.shift * W, (T.A[1] + T.B[1]) / 2 + d.oy * d.shift * W];
     var r = d.rot * Math.PI / 180, co = Math.cos(r), si = Math.sin(r);
     function pos(c) { var lx = (c[0] - 0.5) * T.tw, ly = (c[1] - 0.5) * T.th; return [T.c[0] + lx * co - ly * si, T.c[1] + lx * si + ly * co]; }
     function nearest(P, skip) { var b = -1, bd = 1e9; CORNERS.forEach(function (c, i) { if (i === skip) return; var p = pos(c), dd = Math.hypot(p[0] - P[0], p[1] - P[1]); if (dd < bd) { bd = dd; b = i; } }); return b; }
@@ -107,8 +109,11 @@
     loop = requestAnimationFrame(frame);
     var dt = (now - last) / 1000; last = now;
     if (!(dt > 0)) return; if (dt > 1 / 30) dt = 1 / 30;
-    if (now - ext.t > 90) { var dk = Math.exp(-dt * 14); ext.x *= dk; ext.y *= dk; }   /* сенсордан янги маълумот келмаса, тезланиш нолга тушади */
-    var i, T;
+    var S = Z.sensors, i, T;
+    /* параллакс (бармоқ/эгилиш) — фақат transform */
+    cx += (S.tx - cx) * 0.08; cy += (S.ty - cy) * 0.08;
+    for (i = 0; i < arts.length; i++) arts[i].el.style.transform = "translate3d(" + (cx * 18 * arts[i].k).toFixed(2) + "px," + (cy * 14 * arts[i].k).toFixed(2) + "px,0)";
+    var ext = Z.shake(now);
     for (i = 0; i < tiles.length; i++) { T = tiles[i]; var r = T.art.getBoundingClientRect(); T.cx = r.left + r.width / 2; T.cy = r.top + r.height / 2; }   /* аввал ўқиймиз */
     for (i = 0; i < tiles.length; i++) {
       T = tiles[i];
@@ -116,10 +121,10 @@
       var vx = (T.cx - T.px) / dt, vy = (T.cy - T.py) / dt;
       var ax = clamp((vx - T.pvx) / dt, -7000, 7000), ay = clamp((vy - T.pvy) / dt, -7000, 7000);
       T.px = T.cx; T.py = T.cy; T.pvx = vx; T.pvy = vy;
-      T.sax = T.sax * 0.45 + ax * 0.55; T.say = T.say * 0.45 + ay * 0.55;        /* қўлнинг тезланиши (шовқинсиз) */
-      var fax = T.sax + ext.x, fay = T.say + ext.y;                              /* + телефоннинг ўзи силкинса */
+      T.sax = T.sax * 0.45 + ax * 0.55; T.say = T.say * 0.45 + ay * 0.55;
+      var fax = T.sax + ext.x, fay = T.say + ext.y;
       var n = Math.ceil(dt / (1 / 120)), h = dt / n;
-      for (var s = 0; s < n; s++) {                                              /* қўл рамкасида: инерция кучи = -тезланиш */
+      for (var s = 0; s < n; s++) {
         T.vx += (-K * T.x - CD * T.vx - G * fax) * h; T.x += T.vx * h;
         T.vy += (-KY * T.y - CD * 1.1 * T.vy - G * fay) * h; T.y += T.vy * h;
       }
@@ -127,67 +132,43 @@
       draw(T, now);
     }
   }
-  function start() { if (reduce || loop || !tiles.length) return; last = performance.now(); loop = requestAnimationFrame(frame); }
+  function start() { if (reduce || loop || (!tiles.length && !arts.length)) return; last = performance.now(); loop = requestAnimationFrame(frame); }
   function stop() { if (loop) cancelAnimationFrame(loop); loop = 0; }
   document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
   var rz = 0;
   window.addEventListener("resize", function () { clearTimeout(rz); rz = setTimeout(function () { tiles.forEach(function (T) { layout(T); draw(T, performance.now()); }); }, 120); });
 
-  /* ---------- 4) Телефонни силкитиш ---------- */
-  var gx = 0, gy = 0, gotMotion = false, motionGranted = false;
-  function screenVec(dx, dy) {                       /* қурилма координаталари → экран (ориентацияга қараб) */
-    var ang = (screen.orientation && typeof screen.orientation.angle === "number") ? screen.orientation.angle : (window.orientation || 0);
-    ang = ((ang % 360) + 360) % 360;
-    if (ang === 90) return [-dy, -dx];
-    if (ang === 180) return [-dx, dy];
-    if (ang === 270) return [dy, dx];
-    return [dx, -dy];
-  }
-  window.addEventListener("devicemotion", function (e) {
-    if (reduce) return;
-    var a = e.acceleration, ag = e.accelerationIncludingGravity, dx, dy;
-    if (a && a.x != null) { dx = a.x; dy = a.y; }
-    else if (ag && ag.x != null) { gx = gx * 0.9 + ag.x * 0.1; gy = gy * 0.9 + ag.y * 0.1; dx = ag.x - gx; dy = ag.y - gy; }   /* гравитацияни олиб ташлаш */
-    else return;
-    gotMotion = true; hideMotionBtn();
-    var v = screenVec(dx, dy);
-    ext.x = clamp(v[0] * MS, -2600, 2600); ext.y = clamp(v[1] * MS, -2600, 2600); ext.t = performance.now();
-  }, { passive: true });
-  function hideMotionBtn() { var b = document.querySelector(".motion-btn"); if (b) b.classList.add("hide"); }
-  function needsPermission() { return typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function"; }
-  function motionButton(stage) {
-    if (!needsPermission() || gotMotion || motionGranted || reduce) return;      /* фақат iPhone'да, рухсат ҳали берилмаган бўлса */
-    var b = document.createElement("button");
-    b.type = "button"; b.className = "motion-btn hide";
-    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 8v8M20 8v8M2 10.5v3M22 10.5v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>' + Z.esc(Z.t("motion.enable")) + "</span>";
-    b.addEventListener("click", function () {
-      var reqs = [DeviceMotionEvent.requestPermission()];
-      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") reqs.push(DeviceOrientationEvent.requestPermission());
-      Promise.all(reqs).then(function (r) { if (r.indexOf("granted") > -1) { motionGranted = true; b.classList.add("hide"); } else b.classList.add("hide"); }, function () { b.classList.add("hide"); });
+  /* ---------- 4) Қайтиш (чиқиш) анимацияси: қўллар битта-битта чекинади, танланган — энг охирида ---------- */
+  var HAND_OF = { promo: "h2", anim: "h1", dev: "h3" }, ROW = { h2: 0, h1: 1, h3: 2 };   /* ROW: тепадан пастга */
+  Z.exits.home = function (done, ctx) {
+    var stage = document.getElementById("stage");
+    if (!stage || stage.getAttribute("data-scene") !== "home" || reduce) { done(); return; }
+    stage.classList.add("leaving");
+    var H = window.HANDS || {}, hes = {};
+    Array.prototype.forEach.call(stage.querySelectorAll(".he"), function (he) { hes[he.getAttribute("data-key")] = he; });
+    var chosen = HAND_OF[ctx.to];
+    var order = Object.keys(H).filter(function (k) { return k !== chosen; }).sort(function (a, b) {      /* танлангандан энг узоқдагиси биринчи */
+      return Math.abs(ROW[b] - ROW[chosen]) - Math.abs(ROW[a] - ROW[chosen]) || ROW[b] - ROW[a];
     });
-    stage.appendChild(b);
-    /* сенсордан 1.4с давомида маълумот келмаса (iPhone: рухсат керак) тугмани кўрсатамиз; келса — керак эмас (Android) */
-    setTimeout(function () { if (!gotMotion && !motionGranted) b.classList.remove("hide"); }, 1400);
-  }
+    if (chosen && H[chosen]) order.push(chosen);
+    var finished = false;
+    function fin() { if (finished) return; finished = true; done(); }
+    order.forEach(function (k, i) {
+      var he = hes[k]; if (!he) return;
+      var an = he.animate([{ transform: "translate3d(0,0,0)" }, { transform: "translate3d(" + (H[k].fx || 0) + "%," + (H[k].fy || 0) + "%,0)" }],
+        { duration: 800, delay: i * 260, easing: "cubic-bezier(.55,0,.85,.3)", fill: "forwards" });
+      if (i === order.length - 1) an.onfinish = fin;
+    });
+    setTimeout(fin, 800 + order.length * 260 + 500);                                                    /* ҳимоя */
+  };
 
-  /* ---------- 5) Бошқа саҳифаларни олдиндан юклаш: қўллар чиққач, тинч вақтда, интернет секин бўлмаса ---------- */
-  var prefetched = false;
-  function prefetch() {
-    if (prefetched) return; prefetched = true;
-    var c = navigator.connection;
-    if (c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ""))) return;          /* секин интернетда ҳеч нарса қўшимча юкламаймиз */
-    var v = Z.ver || "", list = ["animation.html", "promotion.html", "dev.html", "js/pages/anim.js" + v, "js/pages/promo.js" + v, "js/pages/dev.js" + v];
-    var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1500); };
-    idle(function () { list.forEach(function (u) { try { fetch(u, { credentials: "same-origin" }).catch(function () {}); } catch (e) {} }); });
-  }
   Z.onRender(function () {
     stop();
     var stage = document.getElementById("stage");
-    arts = []; tiles = []; tx = ty = cx = cy = 0;
-    if (!stage) return;
+    arts = []; tiles = []; cx = cy = 0;
+    if (!stage || stage.getAttribute("data-scene") !== "home") return;
     Array.prototype.forEach.call(stage.querySelectorAll(".art"), function (a) { arts.push({ el: a, k: parseFloat(a.getAttribute("data-k")) || 1 }); });
     buildTiles(stage);
-    motionButton(stage);
     gate(stage);
     start();
   });
