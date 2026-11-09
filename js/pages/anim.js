@@ -27,7 +27,7 @@ Z.noDock = true;
     var balls = BALLS.map(function (b, i) {
       var href = b.wa ? Z.waLink(t(b.wa)) : S.instagram.animations;
       return '<div class="abwrap" data-i="' + i + '"><a class="abal" href="' + e(href) + '" target="_blank" rel="noopener" aria-label="' + e(t(b.aria)) + '">' +
-        '<img class="abimg" alt="" data-ball><span class="ab-logo">' + Z.ICON[b.logo] + '</span><span class="ab-txt" style="--tf:' + b.tf + '">' + e(t(b.key)) + "</span></a></div>";
+        '<img class="abimg" alt="" data-ball><span class="ab-logo">' + Z.ICON[b.logo] + '</span><span class="ab-txt" style="--tf:' + Math.min(b.tf, 1.5 / (t(b.key).length * 0.72)).toFixed(3) + '">' + e(t(b.key)) + "</span></a></div>";
     }).join("");
     var ghosts = BALLS.map(function () { return '<img class="gh" alt="" data-ball><img class="gh" alt="" data-ball>'; }).join("");
     return '<h1 class="sr">' + e(t("nav.anim")) + '</h1><p class="sr">' + e(t("anim.lead")) + "</p>" +

@@ -114,9 +114,9 @@
   "pr.ad": "Reklama",
   "pr.course": "Kurs",
 
-  "an.works": "Ishlar",
+  "an.works": "Ko'rish",
   "an.order": "Buyurtma",
-  "an.course": "Kurs",
+  "an.course": "Yozilish",
 
   "footer.rights": "Barcha huquqlar himoyalangan."
 };

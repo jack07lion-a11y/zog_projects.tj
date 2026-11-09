@@ -114,9 +114,9 @@
   "pr.ad": "Ad video",
   "pr.course": "Course",
 
-  "an.works": "Works",
+  "an.works": "Watch",
   "an.order": "Order",
-  "an.course": "Course",
+  "an.course": "Sign up",
 
   "footer.rights": "All rights reserved."
 };

@@ -114,9 +114,9 @@
   "pr.ad": "Реклама",
   "pr.course": "Курс",
 
-  "an.works": "Работы",
+  "an.works": "Смотреть",
   "an.order": "Заказ",
-  "an.course": "Курс",
+  "an.course": "Запись",
 
   "footer.rights": "Все права защищены."
 };
