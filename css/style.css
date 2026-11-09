@@ -469,12 +469,15 @@ html.nos body::after { animation: none; will-change: auto; }   /* бош саҳ�
 .art { position: relative; will-change: transform; }
 .art > img { display: block; position: relative; z-index: 1; width: 100%; height: auto; }   /* қўл ҳар доим иконка устида */
 
-/* Қўл ушлаб турган иконка (қўл расмининг орқасида, қўл билан бирга қаттиқ ҳаракатланади) */
-.pnl { position: absolute; z-index: 0; translate: -50% -50%; rotate: var(--pr, 0deg); pointer-events: auto; -webkit-tap-highlight-color: transparent; }
-.pnl svg { display: block; width: 100%; height: auto; transition: scale .35s var(--spring); }
-.stage.ready .pnl svg { animation: pnlIn 1.2s cubic-bezier(.2, 1.25, .3, 1) 1.55s backwards; }
-.stage.still .pnl svg { animation: none; }
+/* Қўлдан ип билан осилган иконка (ҳаракатини JS физикаси бошқаради). Расм қўлнинг орқасида, иплар устида */
+.pnl { position: absolute; left: 0; top: 0; z-index: 0; transform-origin: 50% 50%; will-change: transform; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
+.pnl svg { display: block; width: 100%; height: 100%; transition: scale .35s var(--spring); }
 .pnl:active svg { scale: .92; }
 @media (hover: hover) { .pnl:hover svg { scale: 1.06; } }
-@keyframes pnlIn { from { transform: scale(.45) rotate(-14deg); opacity: 0; } to { transform: none; opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .stage .hf, .stage .he, .stage .hi, .pnl svg, .boot i { animation: none !important; } .he { visibility: visible; } }
+.strings { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 2; pointer-events: none; }
+.strings .sh { fill: none; stroke: rgba(18, 21, 32, .3); stroke-width: 3.2; stroke-linecap: round; }
+.strings .st { fill: none; stroke: #fff4de; stroke-width: 1.5; stroke-linecap: round; }
+.strings .st2 { fill: none; stroke: rgba(255, 244, 222, .55); stroke-width: .8; stroke-linecap: round; }
+.strings .kn { fill: #fff4de; stroke: rgba(18, 21, 32, .55); stroke-width: 1; }
+.strings .ey { fill: none; stroke: #ffb066; stroke-width: 2; }
+@media (prefers-reduced-motion: reduce) { .stage .hf, .stage .he, .stage .hi, .boot i { animation: none !important; } .he { visibility: visible; } }
