@@ -93,7 +93,7 @@ window.SITE = {
      x, y — қўл марказининг жойи (саҳна эни/бўйининг %), w — қўл эни (саҳна энининг %)
      r — бурилиш (градус), f — 1 бўлса, ойнадек акс эттирилади, z — қайси қўл устида туради
      fx, fy — учиб киришни бошлайдиган жой (саҳна ўлчамининг %)
-     panel — қўлдан ип билан осилган иконка: icon (anim | promo | dev), href (босилса қаерга боради), k (номи),
+     panel — қўлдан ип билан осилган иконка: icon (anim | promo | dev), glyph (иконка ичидаги чизма: шаффоф расм), href (босилса қаерга боради), k (номи),
              ax, ay — ипнинг биринчи боғланадиган жойи (кўрсаткич бармоқ учи), bx, by — иккинчиси (бош бармоқ учи)
              (иккаласи ҳам қўл расми ўлчамининг %),
              open — қўлнинг очиқ томони (бирлик вектор): иконка шу томонга сал чиқиб туради,
@@ -102,11 +102,11 @@ window.HANDS_SIZES = "(min-aspect-ratio: 1/1) 52vh, 104vw";
 window.HANDS = {
   h1: { ar: 1.2565, src: "assets/hands/hand1-v2.webp", srcset: "assets/hands/hand1-v2-600.webp 600w, assets/hands/hand1-v2-900.webp 900w, assets/hands/hand1-v2.webp 1200w",
         x: 33.9, y: 47.9, w: 103.1, r: 0, f: 0, z: 2, fx: -110, fy: 0,
-        panel: { icon: "anim", href: "animation.html", k: "nav.anim", ax: 89.8, ay: 34.9, bx: 88.7, by: 63.8, open: [0.98, -0.18], pw: 21, rot: -6 } },
+        panel: { icon: "anim", glyph: "assets/icons/anim-v1.webp", href: "animation.html", k: "nav.anim", ax: 89.8, ay: 34.9, bx: 88.7, by: 63.8, open: [0.98, -0.18], pw: 21, rot: -6 } },
   h2: { ar: 1.2207, src: "assets/hands/hand2-v2.webp", srcset: "assets/hands/hand2-v2-600.webp 600w, assets/hands/hand2-v2-900.webp 900w, assets/hands/hand2-v2.webp 1200w",
         x: 68.3, y: 9.5, w: 101.9, r: 0, f: 0, z: 1, fx: 70, fy: -90,
-        panel: { icon: "promo", href: "promotion.html", k: "nav.promo", ax: 12.7, ay: 63.4, bx: 29.4, by: 82.8, open: [-0.8, 0.6], pw: 21, rot: 8 } },
+        panel: { icon: "promo", glyph: "assets/icons/promo-v1.webp", href: "promotion.html", k: "nav.promo", ax: 12.7, ay: 63.4, bx: 29.4, by: 82.8, open: [-0.8, 0.6], pw: 21, rot: 8 } },
   h3: { ar: 1.2097, src: "assets/hands/hand3-v2.webp", srcset: "assets/hands/hand3-v2-600.webp 600w, assets/hands/hand3-v2-900.webp 900w, assets/hands/hand3-v2.webp 1200w",
         x: 71.5, y: 86.2, w: 102, r: 0, f: 0, z: 3, fx: 70, fy: 90,
-        panel: { icon: "dev", href: "dev.html", k: "nav.dev", ax: 10.8, ay: 22.2, bx: 9.6, by: 52.2, open: [-0.92, -0.39], pw: 21, rot: -8 } }
+        panel: { icon: "dev", glyph: "assets/icons/dev-v1.webp", href: "dev.html", k: "nav.dev", ax: 10.8, ay: 22.2, bx: 9.6, by: 52.2, open: [-0.92, -0.39], pw: 21, rot: -8 } }
 };

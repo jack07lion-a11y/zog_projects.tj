@@ -16,7 +16,7 @@
     img.src = s;
   }
   function gate(stage) {
-    var imgs = Array.prototype.slice.call(stage.querySelectorAll(".art > img")), left = imgs.length;
+    var imgs = Array.prototype.slice.call(stage.querySelectorAll(".art img")), left = imgs.length;
     function reveal() { requestAnimationFrame(function () { stage.classList.add("ready"); }); }
     if (!left) { reveal(); return; }
     function one() { if (--left === 0) reveal(); }
