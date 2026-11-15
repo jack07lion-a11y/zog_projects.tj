@@ -583,3 +583,5 @@ html.nos body::after { animation: none; will-change: auto; }   /* бош саҳ�
 .stage.zoomed .dback:active { transform: translateY(4px); box-shadow: 0 1px 0 #b9662a, 0 6px 12px rgba(18, 21, 32, .35), inset 0 1px 0 rgba(255, 255, 255, .8); transition-delay: 0s; transition-duration: .08s; }
 .dback:focus-visible { outline: 2px solid #151a28; outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .dkb, .dback { transition: none !important; } }
+.dkey.sel::before { opacity: .38; }
+.dkey.sel { transform: translateY(calc(var(--kw) * .006)) scale(.96); transition-delay: 0s; }

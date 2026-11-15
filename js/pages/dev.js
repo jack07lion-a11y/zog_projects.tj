@@ -42,7 +42,8 @@ Z.noDock = true;
       "</div></div></div>";
   });
 
-  var cv, cont, kb, cap, capt, pull = null, typer = 0, zt = 0, idleText = "";
+  var cv, cont, kb, cap, capt, pull = null, typer = 0, zt = 0, goT = 0, sayText = "", sayStart = 0, idleText = "";
+  var CPS = 30, READ = 1100;                       /* ҳарф тезлиги (мс) ва матн терилиб бўлгач ўқиш учун танаффус (мс) */
   function layout() {
     var W = cv.clientWidth, H = cv.clientHeight;
     var iw = W, ih = iw / A.ar;
@@ -65,10 +66,10 @@ Z.noDock = true;
   }
   /* Тепада терилаётган матн */
   function say(text) {
-    clearInterval(typer);
+    clearInterval(typer); sayText = text; sayStart = performance.now();
     if (reduce) { capt.textContent = text; return; }
     var i = 0; capt.textContent = "";
-    typer = setInterval(function () { i++; capt.textContent = text.slice(0, i); if (i >= text.length) clearInterval(typer); }, 18);
+    typer = setInterval(function () { i++; capt.textContent = text.slice(0, i); if (i >= text.length) clearInterval(typer); }, CPS);
   }
   function bind() {
     var bk = cont.querySelector("#dback");
@@ -78,6 +79,17 @@ Z.noDock = true;
       ["pointerdown", "focus"].forEach(function (ev) { k.addEventListener(ev, function () { k.classList.add("p"); say(txt); }, { passive: true }); });
       ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(function (ev) { k.addEventListener(ev, function () { k.classList.remove("p"); }, { passive: true }); });
       k.addEventListener("mouseenter", function () { say(txt); });
+      /* Босилганда аввал матн терилади, фойдаланувчи ўқиб улгургач — ўтилади */
+      k.addEventListener("click", function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        var href = k.getAttribute("href"); if (!href) return;
+        if (sayText !== txt) say(txt);
+        var typed = txt.length * CPS, left = Math.max(0, typed - (performance.now() - sayStart)) + (reduce ? 300 : READ);
+        Array.prototype.forEach.call(cont.querySelectorAll(".dkey.sel"), function (x) { x.classList.remove("sel"); });
+        k.classList.add("sel"); clearTimeout(goT);
+        goT = setTimeout(function () { k.classList.remove("sel"); window.location.href = href; }, left);
+      });
     });
   }
   document.addEventListener("keydown", function (e) {
@@ -88,7 +100,7 @@ Z.noDock = true;
 
   /* Чиқиш: клавиатура секин, чиройли пастга сузиб кетади (шу пайт бош саҳна скриптлари юкланади) */
   Z.exits.dev = function (done) {
-    clearTimeout(zt);
+    clearTimeout(zt); clearTimeout(goT);
     var a = document.getElementById("dcont"), st = document.getElementById("stage");
     var zoomed = !!(st && st.classList.contains("zoomed"));
     if (zoomed) { st.classList.remove("zoomed"); if (kb) kb.classList.remove("z"); }       /* аввал клавиатура кичраяди (zoom out) */
@@ -106,7 +118,7 @@ Z.noDock = true;
   };
 
   Z.onRender(function () {
-    clearInterval(typer); clearTimeout(zt); cv = cont = kb = cap = capt = null; pull = null;
+    clearInterval(typer); clearTimeout(zt); clearTimeout(goT); cv = cont = kb = cap = capt = null; pull = null;
     var stage = document.getElementById("stage");
     if (!stage || stage.getAttribute("data-scene") !== "dev") return;
     cv = stage.querySelector("#cv"); cont = stage.querySelector("#dcont"); kb = cont.querySelector("#dkb"); cap = cont.querySelector("#dcap"); capt = cont.querySelector("#dcapt");
