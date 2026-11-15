@@ -118,5 +118,14 @@
   "an.order": "Заказ",
   "an.course": "Запись",
 
+  "dv.game": "Игра",
+  "dv.app": "Апп",
+  "dv.web": "Веб",
+  "dv.site": "Сайт",
+  "dv.course": "Курс",
+  "dv.insta": "Инста",
+  "dv.chat": "Чат",
+  "dv.soon": "Скоро",
+
   "footer.rights": "Все права защищены."
 };

@@ -535,3 +535,38 @@ html.nos body::after { animation: none; will-change: auto; }   /* бош саҳ�
 .ab-logo svg { width: 100%; height: 100%; }
 .ab-txt { position: absolute; left: 0; right: 0; top: 52%; text-align: center; white-space: nowrap; font-weight: 800; font-size: calc(var(--R) * var(--tf)); line-height: 1.05; color: var(--cream); text-shadow: 0 1px 3px rgba(0, 0, 0, .55); pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .acont { visibility: visible; } }
+
+/* ================= Dev & Game саҳнаси: пастдан чиқадиган клавиатура ================= */
+.dscene .canvas { touch-action: none; }
+.dcont { position: absolute; inset: 0; visibility: hidden; will-change: transform; }
+.stage.ready .dcont { visibility: visible; animation: dkIn 1.9s linear backwards; }
+.stage.still .dcont { visibility: visible; animation: none; }
+/* Пастдан силлиқ кўтарилади: аввал тез, охирида юмшоқ тўхтайди */
+@keyframes dkIn {
+  0% { transform: translate3d(0, 108%, 0); animation-timing-function: cubic-bezier(.16, .8, .22, 1); }
+  100% { transform: none; }
+}
+.dkb { position: absolute; }
+.dkb > img { display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.dkey { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--kw) * .005);
+  color: #151a28; font-weight: 800; font-size: calc(var(--kw) * .0215 * var(--f, 1)); line-height: 1; letter-spacing: -.01em; text-decoration: none;
+  border-radius: calc(var(--kw) * .014); -webkit-tap-highlight-color: transparent; opacity: 0; transform: translateY(3px) scale(.9);
+  transition: opacity .35s ease, transform .35s var(--spring, ease); transition-delay: calc(var(--i) * 55ms + 1.1s); }
+.stage.ready .dkey, .stage.still .dkey { opacity: 1; transform: none; }
+.stage.still .dkey { transition-delay: 0s; }
+.dkey::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #fff; opacity: 0; transition: opacity .12s; }
+.dkey.p::before, .dkey:active::before { opacity: .32; }
+.dkey.p, .dkey:active { transform: translateY(calc(var(--kw) * .006)) scale(.96); transition-delay: 0s; transition-duration: .08s; }
+@media (hover: hover) { .dkey:hover::before { opacity: .16; } }
+.dkey:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.dk-i { width: calc(var(--kw) * .036); height: calc(var(--kw) * .036); display: block; position: relative; }
+.dk-i svg { width: 100%; height: 100%; display: block; stroke-width: 2.2; }
+.dk-t { position: relative; white-space: nowrap; }
+.dkey.off { opacity: 0; }
+.stage.ready .dkey.off, .stage.still .dkey.off { opacity: .5; }
+.dcap { position: absolute; left: 0; right: 0; text-align: center; font: 700 15px/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #fff3df; padding: 0 22px;
+  text-shadow: 0 1px 8px rgba(18, 21, 32, .45); pointer-events: none; opacity: 0; transition: opacity .5s ease; min-height: 1.3em; }
+.stage.typing .dcap { opacity: 1; }
+.dcur { display: inline-block; width: .55em; height: 1.05em; margin-left: 3px; vertical-align: -.16em; background: #151a28; animation: dcur 1s steps(1) infinite; }
+@keyframes dcur { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .dcont { visibility: visible; animation: none !important; } .dkey { transition: none !important; opacity: 1; transform: none; } .dcur { animation: none; } }

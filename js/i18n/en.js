@@ -118,5 +118,14 @@
   "an.order": "Order",
   "an.course": "Sign up",
 
+  "dv.game": "Game",
+  "dv.app": "App",
+  "dv.web": "Web",
+  "dv.site": "Site",
+  "dv.course": "Course",
+  "dv.insta": "Insta",
+  "dv.chat": "Chat",
+  "dv.soon": "Soon",
+
   "footer.rights": "All rights reserved."
 };

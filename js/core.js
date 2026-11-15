@@ -460,8 +460,10 @@
     var from = Z.page;
     if (!SCENES[to] || !SCENES[from] || to === from || navBusy) return false;
     navBusy = true; warmScene(to);
+    var pre = Promise.all(SCENES[to].scripts.map(loadScript));      /* чиқиш анимацияси давомида келаётган саҳна скриптлари юкланади */
+    pre.catch(function () {});
     function go() {
-      Promise.all(SCENES[to].scripts.map(loadScript)).then(function () {
+      pre.then(function () {
         Z.page = to;
         if (!opts.pop) { try { history.pushState({ scene: to, d: Z.depth + 1 }, "", SCENES[to].href); Z.depth += 1; } catch (e) {} }
         window.scrollTo(0, 0);
@@ -479,6 +481,7 @@
      Етарлича тортилса — onComplete (одатда Z.back); бўлмаса пружинадек жойига қайтади. Ҳеч қандай кўринадиган тугма йўқ. */
   Z.pull = function (root, mover, opts) {
     opts = opts || {};
+    var sw = opts.dir === "down" ? 1 : -1;                /* чиқиш йўналиши: -1 тепага, 1 пастга */
     var st = null, moved = false, lastMove = 0, off = 0, lastY = 0, lastT = 0, vel = 0, wacc = 0, wt = 0, enabled = !!opts.enabled;
     function H() { return root.clientHeight || window.innerHeight; }
     function apply(o) { off = o; Z.pullOffset = o; mover.style.transition = "none"; mover.style.transform = "translate3d(0," + o.toFixed(1) + "px,0)"; }
@@ -494,28 +497,28 @@
     root.addEventListener("pointermove", function (e) {
       if (!st) return;
       var dy = e.clientY - st.y;
-      if (!moved) { if (Math.abs(dy) < 10) return; if (dy > 0) { st = null; return; } moved = true; try { root.setPointerCapture(e.pointerId); } catch (x) {} }
+      if (!moved) { if (Math.abs(dy) < 10) return; if (dy * sw < 0) { st = null; return; } moved = true; try { root.setPointerCapture(e.pointerId); } catch (x) {} }
       var now = performance.now(); if (now > lastT) vel = (e.clientY - lastY) / (now - lastT); lastY = e.clientY; lastT = now;
-      apply(dy < 0 ? dy : dy * 0.18);                  /* тепага — эркин, пастга — қаршилик */
+      apply(dy * sw > 0 ? dy : dy * 0.18);             /* чиқиш томонга — эркин, тескарисига — қаршилик */
     });
     function up() {
       if (!st) return; st = null;
       if (!moved) return;
       lastMove = performance.now();
-      if (off < -H() * 0.2 || (vel < -0.7 && off < -40)) complete(); else spring();
+      if (off * sw > H() * 0.2 || (vel * sw > 0.7 && off * sw > 40)) complete(); else spring();
     }
     root.addEventListener("pointerup", up); root.addEventListener("pointercancel", up);
     root.addEventListener("click", function (e) { if (moved || performance.now() - lastMove < 350) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
     root.addEventListener("wheel", function (e) {
       if (!enabled) return;
-      if (e.deltaY <= 0 && off >= 0) return;
+      if (e.deltaY <= 0 && off * sw <= 0) return;
       e.preventDefault();
-      wacc = Math.max(-H() * 0.7, Math.min(0, wacc - e.deltaY)); apply(wacc);
-      clearTimeout(wt); wt = setTimeout(function () { if (off < -H() * 0.16) complete(); else { wacc = 0; spring(); } }, 170);
+      wacc = sw * Math.max(0, Math.min(H() * 0.7, sw * (wacc + sw * e.deltaY))); apply(wacc);
+      clearTimeout(wt); wt = setTimeout(function () { if (off * sw > H() * 0.16) complete(); else { wacc = 0; spring(); } }, 170);
     }, { passive: false });
     return {
       enable: function () { enabled = true; },
-      key: function () { if (!enabled) return; apply(-H() * 0.25); complete(); }          /* ArrowUp / Backspace / Escape */
+      key: function () { if (!enabled) return; apply(sw * H() * 0.25); complete(); }          /* ArrowUp / Backspace / Escape */
     };
   };
 

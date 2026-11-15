@@ -118,5 +118,14 @@
   "an.order": "Buyurtma",
   "an.course": "Yozilish",
 
+  "dv.game": "O'yin",
+  "dv.app": "Ilova",
+  "dv.web": "Veb",
+  "dv.site": "Sayt",
+  "dv.course": "Kurs",
+  "dv.insta": "Insta",
+  "dv.chat": "Chat",
+  "dv.soon": "Yaqinda",
+
   "footer.rights": "Barcha huquqlar himoyalangan."
 };

@@ -125,5 +125,24 @@ window.SCENE_ASSETS = {
     src: "assets/promo/hand-v1.webp",
     srcset: "assets/promo/hand-v1-600.webp 600w, assets/promo/hand-v1-900.webp 900w, assets/promo/hand-v1.webp 1200w",
     anchors: { pinky: [7.5, 81.4], middle: [30.0, 68.7], index: [55.8, 61.0], thumb: [91.7, 74.3] }
+  },
+  /* Dev & Game: механик клавиатура ва икки қўл пастдан чиқади. keys — 10 та бўш тўқ сариқ тугманинг жойи (расм пикселларида: x1, y1, x2, y2);
+     биринчи қатор чапдан ўнгга, кейин иккинчи қатор. Тугмага қайси ёзув/вазифа қўйилгани js/pages/dev.js даги KEYS да. */
+  dev: {
+    ar: 0.7065, iw: 941, ih: 1332, sizes: "(min-aspect-ratio: 1/1) 52vh, 100vw",
+    src: "assets/dev/kb-v1.webp",
+    srcset: "assets/dev/kb-v1-480.webp 480w, assets/dev/kb-v1-700.webp 700w, assets/dev/kb-v1.webp 941w",
+    keys: [
+      [29, 73, 114, 139],
+      [122, 73, 204, 138],
+      [212, 73, 295, 138],
+      [302, 73, 386, 138],
+      [393, 73, 477, 138],
+      [27, 161, 111, 229],
+      [122, 161, 203, 229],
+      [213, 161, 294, 229],
+      [305, 161, 385, 229],
+      [394, 161, 476, 229]
+    ]
   }
 };
