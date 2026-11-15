@@ -125,6 +125,7 @@
   "dv.course": "Course",
   "dv.insta": "Insta",
   "dv.chat": "Chat",
+  "dv.back": "Back",
   "dv.soon": "Soon",
 
   "footer.rights": "All rights reserved."

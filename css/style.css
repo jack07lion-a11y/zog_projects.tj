@@ -570,3 +570,16 @@ html.nos body::after { animation: none; will-change: auto; }   /* бош саҳ�
 .dcur { display: inline-block; width: .55em; height: 1.05em; margin-left: 3px; vertical-align: -.16em; background: #151a28; animation: dcur 1s steps(1) infinite; }
 @keyframes dcur { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .dcont { visibility: visible; animation: none !important; } .dkey { transition: none !important; opacity: 1; transform: none; } .dcur { animation: none; } }
+
+/* Dev: тугмаларга яқинлашиш (zoom) ва клавиатуранинг "Delete" тугмаси (орқага) */
+.dkb { transform-origin: var(--ox, 50%) var(--oy, 50%); transition: transform .95s cubic-bezier(.66, 0, .14, 1); will-change: transform; }
+.dkb.z { transform: translate3d(var(--zx, 0), var(--zy, 0), 0) scale(var(--zs, 1)); }
+.dback { position: absolute; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 6; width: 76px; height: 60px; border: 0; border-radius: 16px; padding: 0;
+  display: grid; place-items: center; color: #151a28; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(180deg, #fff1d8, #ffd7a0); box-shadow: 0 5px 0 #b9662a, 0 12px 22px rgba(18, 21, 32, .38), inset 0 1px 0 rgba(255, 255, 255, .8);
+  opacity: 0; transform: translateY(26px) scale(.9); pointer-events: none; transition: opacity .4s ease, transform .5s var(--spring, ease), box-shadow .1s; }
+.dback svg { width: 30px; height: 30px; }
+.stage.zoomed .dback { opacity: 1; transform: none; pointer-events: auto; transition-delay: .55s, .55s, 0s; }
+.stage.zoomed .dback:active { transform: translateY(4px); box-shadow: 0 1px 0 #b9662a, 0 6px 12px rgba(18, 21, 32, .35), inset 0 1px 0 rgba(255, 255, 255, .8); transition-delay: 0s; transition-duration: .08s; }
+.dback:focus-visible { outline: 2px solid #151a28; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .dkb, .dback { transition: none !important; } }

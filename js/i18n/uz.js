@@ -125,6 +125,7 @@
   "dv.course": "Kurs",
   "dv.insta": "Insta",
   "dv.chat": "Chat",
+  "dv.back": "Orqaga",
   "dv.soon": "Yaqinda",
 
   "footer.rights": "Barcha huquqlar himoyalangan."

@@ -125,6 +125,7 @@
   "dv.course": "Курс",
   "dv.insta": "Инста",
   "dv.chat": "Чат",
+  "dv.back": "Назад",
   "dv.soon": "Скоро",
 
   "footer.rights": "Все права защищены."

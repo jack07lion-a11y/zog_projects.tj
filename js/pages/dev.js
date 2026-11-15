@@ -37,10 +37,12 @@ Z.noDock = true;
     return '<h1 class="sr">' + e(t("nav.dev")) + '</h1><p class="sr">' + e(t("dev.lead")) + "</p>" +
       '<div class="stage dscene' + (Z.fromLang ? " still" : "") + '" id="stage" data-scene="dev"><div class="boot" aria-hidden="true"><i></i></div>' +
       '<div class="canvas" id="cv"><div class="dcont" id="dcont"><div class="dcap" id="dcap" aria-hidden="true"><span id="dcapt"></span><i class="dcur"></i></div>' +
-      '<div class="dkb" id="dkb">' + img + keys + "</div></div></div></div>";
+      '<div class="dkb" id="dkb">' + img + keys + "</div>" +
+      '<button type="button" class="dback" id="dback" aria-label="' + e(t("dv.back")) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6.5 7L9 19h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="m15.5 9.5-5 5M10.5 9.5l5 5"/></svg></button>' +
+      "</div></div></div>";
   });
 
-  var cv, cont, kb, cap, capt, pull = null, typer = 0, idleText = "";
+  var cv, cont, kb, cap, capt, pull = null, typer = 0, zt = 0, idleText = "";
   function layout() {
     var W = cv.clientWidth, H = cv.clientHeight;
     var iw = W, ih = iw / A.ar;
@@ -48,6 +50,18 @@ Z.noDock = true;
     kb.style.cssText = "left:" + ((W - iw) / 2).toFixed(1) + "px;top:" + (H - ih).toFixed(1) + "px;width:" + iw.toFixed(1) + "px;height:" + ih.toFixed(1) + "px;--kw:" + iw.toFixed(1) + "px";
     var gap = H - ih;
     cap.style.top = Math.max(10, gap * 0.45 - 12).toFixed(1) + "px";
+    /* Яқинлаштириш: 10 та тўқ сариқ тугма блоки экран энини тўлдиради. Блок маркази экранда юқорироқда туради */
+    var bx0 = 1e9, by0 = 1e9, bx1 = 0, by1 = 0;
+    A.keys.forEach(function (b) { bx0 = Math.min(bx0, b[0]); by0 = Math.min(by0, b[1]); bx1 = Math.max(bx1, b[2]); by1 = Math.max(by1, b[3]); });
+    var k = iw / A.iw, ocx = (bx0 + bx1) / 2 * k, ocy = (by0 + by1) / 2 * k;
+    var zs = Math.min(0.94 * W / ((bx1 - bx0) * k), 2.6);
+    var tx = W / 2 - ((W - iw) / 2 + ocx), ty = Math.max(H * 0.3, 118 + (by1 - by0) * k * zs / 2) - ((H - ih) + ocy);
+    kb.style.setProperty("--ox", ocx.toFixed(1) + "px"); kb.style.setProperty("--oy", ocy.toFixed(1) + "px");
+    kb.style.setProperty("--zx", tx.toFixed(1) + "px"); kb.style.setProperty("--zy", ty.toFixed(1) + "px"); kb.style.setProperty("--zs", zs.toFixed(3));
+  }
+  function zoomIn() {
+    var stage = document.getElementById("stage"); if (!stage || !kb) return;
+    kb.classList.add("z"); stage.classList.add("zoomed");
   }
   /* Тепада терилаётган матн */
   function say(text) {
@@ -57,6 +71,8 @@ Z.noDock = true;
     typer = setInterval(function () { i++; capt.textContent = text.slice(0, i); if (i >= text.length) clearInterval(typer); }, 18);
   }
   function bind() {
+    var bk = cont.querySelector("#dback");
+    if (bk) bk.addEventListener("click", function () { if (pull) pull.key(); else Z.back(); });
     Array.prototype.forEach.call(cont.querySelectorAll(".dkey"), function (k) {
       var txt = k.getAttribute("data-say");
       ["pointerdown", "focus"].forEach(function (ev) { k.addEventListener(ev, function () { k.classList.add("p"); say(txt); }, { passive: true }); });
@@ -72,19 +88,25 @@ Z.noDock = true;
 
   /* Чиқиш: клавиатура секин, чиройли пастга сузиб кетади (шу пайт бош саҳна скриптлари юкланади) */
   Z.exits.dev = function (done) {
-    var a = document.getElementById("dcont");
+    clearTimeout(zt);
+    var a = document.getElementById("dcont"), st = document.getElementById("stage");
+    var zoomed = !!(st && st.classList.contains("zoomed"));
+    if (zoomed) { st.classList.remove("zoomed"); if (kb) kb.classList.remove("z"); }       /* аввал клавиатура кичраяди (zoom out) */
     if (!a || reduce) { done(); return; }
-    var from = Z.pullOffset || 0, pulled = from > 30;
     var c = document.getElementById("dcap"); if (c) c.style.opacity = 0;
-    a.style.transition = "none";
-    var an = a.animate([{ transform: "translate3d(0," + from + "px,0)" }, { transform: "translate3d(0,112%,0)" }],
-      { duration: pulled ? 1100 : 1500, easing: "cubic-bezier(.42,.05,.4,1)", fill: "forwards" });
-    var fin = false; function f() { if (!fin) { fin = true; Z.pullOffset = 0; done(); } }
-    an.onfinish = f; setTimeout(f, 2200);
+    function crawl() {                                                                         /* кейин секин пастга сузиб кетади */
+      var from = Z.pullOffset || 0, pulled = from > 30;
+      a.style.transition = "none";
+      var an = a.animate([{ transform: "translate3d(0," + from + "px,0)" }, { transform: "translate3d(0,112%,0)" }],
+        { duration: pulled ? 1100 : 1500, easing: "cubic-bezier(.42,.05,.4,1)", fill: "forwards" });
+      var fin = false; function f() { if (!fin) { fin = true; Z.pullOffset = 0; done(); } }
+      an.onfinish = f; setTimeout(f, 2200);
+    }
+    if (zoomed) setTimeout(crawl, 700); else crawl();
   };
 
   Z.onRender(function () {
-    clearInterval(typer); cv = cont = kb = cap = capt = null; pull = null;
+    clearInterval(typer); clearTimeout(zt); cv = cont = kb = cap = capt = null; pull = null;
     var stage = document.getElementById("stage");
     if (!stage || stage.getAttribute("data-scene") !== "dev") return;
     cv = stage.querySelector("#cv"); cont = stage.querySelector("#dcont"); kb = cont.querySelector("#dkb"); cap = cont.querySelector("#dcap"); capt = cont.querySelector("#dcapt");
@@ -94,6 +116,7 @@ Z.noDock = true;
       requestAnimationFrame(function () {
         stage.classList.add("ready");
         setTimeout(function () { stage.classList.add("typing"); say(idleText); }, reduce || Z.fromLang ? 0 : 1300);
+        if (reduce || Z.fromLang) zoomIn(); else zt = setTimeout(zoomIn, 2150);                 /* кўтарилгач, тугмаларга яқинлашади */
       });
     });
     /* пастга суриш (ёки скролл) — бош саҳнага қайтиш; кириш анимацияси тугагач ёқилади */
