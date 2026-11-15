@@ -195,7 +195,7 @@
     }).join("");
     document.getElementById("site-header").innerHTML =
       '<div class="wrap bar">' +
-      '<a class="logo" href="index.html" aria-label="' + esc(S.name) + '"><img src="assets/icon-192.png" alt="" width="38" height="38"><b><span>ZOG</span> Projects</b></a>' +
+      '<a class="logo" href="index.html" aria-label="' + esc(S.name) + '"><img src="assets/icon-192.png?v=2" alt="" width="38" height="38"><b><span>ZOG</span> Projects</b></a>' +
       '<nav class="nav" aria-label="Main">' + links + "</nav>" +
       '<div class="lang"><button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Language">' +
       ICON.globe + esc(langMeta(lang).name) + ICON.chev + '</button><ul class="lang-menu" role="menu">' + items + "</ul></div>" +
