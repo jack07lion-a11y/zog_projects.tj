@@ -9,7 +9,7 @@
 | Ўртадаги қўл (h1) | **Animation** | `animation.html`, `js/pages/anim.js` |
 | Пастдаги қўл (h3) | **Code** = **Dev & Game** (иккови бир хил) | `dev.html`, `js/pages/dev.js` |
 
-Instagram: `zog_promotions`, `zog_animations`, `zog_dev`. WhatsApp: +992 90 753 95 27. Телеграм ҳозирча керак эмас.
+Instagram: `zog_promotions`, `zog_animations`, `zog_dev`. WhatsApp: +992 17 926 86 36. Телеграм ҳозирча керак эмас.
 
 ## Умумий қоидалар
 - Тиллар: тожикча (асосий), русча, ўзбекча (лотин), инглизча. Минтақа бўйича автоматик. Матнлар: `js/i18n/*.js`.

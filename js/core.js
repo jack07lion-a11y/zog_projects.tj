@@ -12,7 +12,7 @@
     { code: "uz", name: "UZ", label: "Oʻzbekcha", htmlLang: "uz" }, { code: "en", name: "EN", label: "English", htmlLang: "en" }
   ];
   S.defaultLang = S.defaultLang || "tg"; S.fallbackLang = S.fallbackLang || "en";
-  S.instagram = S.instagram || {}; S.whatsapp = S.whatsapp || "992907539527"; S.name = S.name || "ZOG Projects";
+  S.instagram = S.instagram || {}; S.whatsapp = S.whatsapp || "992179268636"; S.name = S.name || "ZOG Projects";
   Z.ver = VER;
   var loaded = {};
   Z.hooks = [];

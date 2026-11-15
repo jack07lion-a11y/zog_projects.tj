@@ -43,8 +43,8 @@ window.SITE = {
   url: "https://jack07lion-a11y.github.io/zog_projects.tj",
 
   /* WhatsApp: фақат рақамлар, "+" ва бўшлиқсиз */
-  whatsapp: "992907539527",
-  phoneDisplay: "+992 90 753 95 27",
+  whatsapp: "992179268636",
+  phoneDisplay: "+992 17 926 86 36",
 
   /* Телеграм username (@ белгисиз). Бўш бўлса, Телеграм тугмаси кўринмайди.
      Ҳозирча керак эмас. */
